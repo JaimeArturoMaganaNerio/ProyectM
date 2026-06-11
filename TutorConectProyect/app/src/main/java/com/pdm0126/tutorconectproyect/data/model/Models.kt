@@ -67,9 +67,11 @@ data class Booking(
     @DocumentId val id: String = "",
     val studentId: String = "",
     val tutorId: String = "",
+    val tutorName: String = "", // Para mostrarlo rápido en el calendario
     val subject: String = "",
-    val date: Date = Date(),
-    val status: String = "PENDING", // PENDING, ACCEPTED, REJECTED, COMPLETED
+    val date: String = "", // Ajustado a String para tu UI
+    val time: String = "", // Ajustado a String para tu UI
+    val status: String = "PENDING",
     val notes: String = ""
 )
 
@@ -86,5 +88,14 @@ data class UiChatMessage(
     val text: String = "",
     val fromMe: Boolean = false,
     val timestamp: String = ""
+)
+
+data class TutoringSession(
+    val id: String = "",
+    val title: String = "",
+    val tutorName: String = "",
+    val date: String = "",
+    val time: String = "",
+    val status: String = ""
 )
 

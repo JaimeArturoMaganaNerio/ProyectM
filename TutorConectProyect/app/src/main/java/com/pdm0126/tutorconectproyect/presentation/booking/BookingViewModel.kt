@@ -1,22 +1,29 @@
-package com.tutorconnect.presentation.booking
+package com.pdm0126.tutorconectproyect.presentation.booking
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.tutorconnect.data.model.BookingRequest
-import com.tutorconnect.data.repository.BookingRepository
+import com.pdm0126.tutorconectproyect.data.model.Booking
+import com.pdm0126.tutorconectproyect.data.repository.AuthRepository
+import com.pdm0126.tutorconectproyect.data.repository.BookingRepository
+import com.tutorconnect.presentation.booking.BookingUiAction
+import com.tutorconnect.presentation.booking.BookingUiEvent
+import com.tutorconnect.presentation.booking.BookingUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.tutorconnect.domain.Resource
 
 @HiltViewModel
 class BookingViewModel @Inject constructor(
-    private val repository: BookingRepository,
+    private val bookingRepository: BookingRepository,
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(BookingUiState())
@@ -53,25 +60,44 @@ class BookingViewModel @Inject constructor(
             _uiState.update { it.copy(showErrors = true) }
             return
         }
+
         viewModelScope.launch {
             _uiState.update { it.copy(isSubmitting = true) }
-            val request = BookingRequest(
+
+            // Obtenemos al usuario que está logueado haciendo la reserva
+            val currentUser = authRepository.currentUser.firstOrNull()
+
+            if (currentUser == null) {
+                _uiState.update { it.copy(isSubmitting = false) }
+                _events.send(BookingUiEvent.ShowMessage("Debes iniciar sesión para reservar"))
+                return@launch
+            }
+
+            // Creamos el modelo de Firebase
+            val newBooking = Booking(
+                studentId = currentUser.id,
                 tutorId = tutorId,
+                tutorName = current.tutorName,
                 subject = current.subject.trim(),
                 date = current.date.trim(),
                 time = current.time.trim(),
-                comments = current.comments.trim(),
+                notes = current.comments.trim(),
+                status = "PENDING"
             )
-            repository.book(request)
-                .onSuccess {
+
+            // Enviamos a Firestore
+            when (val result = bookingRepository.createBooking(newBooking)) {
+                is Resource.Success -> {
                     _uiState.update { it.copy(isSubmitting = false) }
                     _events.send(BookingUiEvent.ShowMessage("¡Tutoría reservada con éxito!"))
                     _events.send(BookingUiEvent.Booked)
                 }
-                .onFailure { e ->
+                is Resource.Error -> {
                     _uiState.update { it.copy(isSubmitting = false) }
-                    _events.send(BookingUiEvent.ShowMessage(e.message ?: "No se pudo reservar."))
+                    _events.send(BookingUiEvent.ShowMessage(result.message ?: "No se pudo reservar."))
                 }
+                is Resource.Loading -> {}
+            }
         }
     }
 
