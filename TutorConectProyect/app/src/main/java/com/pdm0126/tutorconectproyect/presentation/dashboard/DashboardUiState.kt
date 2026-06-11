@@ -1,7 +1,9 @@
 package com.tutorconnect.presentation.dashboard
 
-import com.tutorconnect.data.model.FeaturedPost
-import com.tutorconnect.data.model.Subject
+import com.pdm0126.tutorconectproyect.data.model.FeaturedPost
+import com.pdm0126.tutorconectproyect.data.model.UiChatMessage
+import javax.security.auth.Subject
+
 
 data class DashboardUiState(
     val studentName: String = "",          // vendrá del backend al hacer login
@@ -10,6 +12,7 @@ data class DashboardUiState(
     val featuredPosts: List<FeaturedPost> = emptyList(),
     val isLoading: Boolean = true,
     val error: String? = null,
+    val messages: List<UiChatMessage> = emptyList()
 )
 
 sealed interface DashboardUiAction {

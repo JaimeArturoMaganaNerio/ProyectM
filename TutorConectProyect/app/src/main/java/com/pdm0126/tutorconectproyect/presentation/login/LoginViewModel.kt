@@ -1,10 +1,16 @@
-package com.tutorconnect.presentation.login
+package com.pdm0126.tutorconectproyect.presentation.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+
+import com.pdm0126.tutorconectproyect.data.model.UserRole
+import com.pdm0126.tutorconectproyect.data.repository.AuthRepository
 import com.tutorconnect.core.utils.Validators
-import com.tutorconnect.data.model.UserRole
-import com.tutorconnect.data.repository.AuthRepository
+import com.tutorconnect.domain.Resource
+import com.tutorconnect.presentation.login.LoginUiAction
+import com.tutorconnect.presentation.login.LoginUiEvent
+import com.tutorconnect.presentation.login.LoginUiState
+
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +23,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val authRepository: AuthRepository,
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LoginUiState())
@@ -28,30 +34,21 @@ class LoginViewModel @Inject constructor(
 
     fun onAction(action: LoginUiAction) {
         when (action) {
-            is LoginUiAction.EmailChanged ->
-                _uiState.update { it.copy(email = action.value, emailError = null, generalError = null) }
-            is LoginUiAction.PasswordChanged ->
-                _uiState.update { it.copy(password = action.value, passwordError = null, generalError = null) }
-            is LoginUiAction.FullNameChanged ->
-                _uiState.update { it.copy(fullName = action.value) }
-            is LoginUiAction.RoleSelected ->
-                _uiState.update { it.copy(selectedRole = action.role) }
-            LoginUiAction.ToggleMode ->
-                _uiState.update { it.copy(isRegisterMode = !it.isRegisterMode, generalError = null) }
+            is LoginUiAction.EmailChanged -> _uiState.update { it.copy(email = action.value, emailError = null, generalError = null) }
+            is LoginUiAction.PasswordChanged -> _uiState.update { it.copy(password = action.value, passwordError = null, generalError = null) }
+            is LoginUiAction.FullNameChanged -> _uiState.update { it.copy(fullName = action.value) }
+            is LoginUiAction.RoleSelected -> _uiState.update { it.copy(selectedRole = action.role) }
+            LoginUiAction.ToggleMode -> _uiState.update { it.copy(isRegisterMode = !it.isRegisterMode, generalError = null) }
             LoginUiAction.Submit -> submit()
-            LoginUiAction.MicrosoftLogin -> microsoftLogin()
-            LoginUiAction.ForgotPassword -> viewModelScope.launch {
-                _events.send(LoginUiEvent.ShowMessage("Te enviaremos un enlace de recuperación."))
-            }
+            LoginUiAction.MicrosoftLogin -> viewModelScope.launch { _events.send(LoginUiEvent.ShowMessage("Usa correo institucional.")) }
+            LoginUiAction.ForgotPassword -> viewModelScope.launch { _events.send(LoginUiEvent.ShowMessage("Contacta a soporte.")) }
         }
     }
 
     private fun submit() {
         val state = _uiState.value
-        val emailError = if (!Validators.isInstitutionalEmail(state.email))
-            "Usa tu correo institucional (@uca.edu.sv)." else null
-        val passwordError = if (!Validators.isValidPassword(state.password))
-            "Mínimo 6 caracteres." else null
+        val emailError = if (!Validators.isInstitutionalEmail(state.email)) "Usa tu correo @uca.edu.sv" else null
+        val passwordError = if (!Validators.isValidPassword(state.password)) "Mínimo 6 caracteres" else null
 
         if (emailError != null || passwordError != null) {
             _uiState.update { it.copy(emailError = emailError, passwordError = passwordError) }
@@ -60,22 +57,22 @@ class LoginViewModel @Inject constructor(
 
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            val result = authRepository.login(state.email, state.password)
-            _uiState.update { it.copy(isLoading = false) }
-            result
-                .onSuccess { _events.send(LoginUiEvent.NavigateToDashboard) }
-                .onFailure { e -> _uiState.update { it.copy(generalError = e.message) } }
-        }
-    }
+            val isTutor = state.selectedRole == UserRole.TUTOR
 
-    private fun microsoftLogin() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-            val result = authRepository.loginWithMicrosoft()
-            _uiState.update { it.copy(isLoading = false) }
-            result
-                .onSuccess { _events.send(LoginUiEvent.NavigateToDashboard) }
-                .onFailure { e -> _uiState.update { it.copy(generalError = e.message) } }
+            val result = if (state.isRegisterMode) {
+                authRepository.register(state.email, state.password, state.fullName, isTutor)
+            } else {
+                authRepository.login(state.email, state.password)
+            }
+
+            when (result) {
+                is Resource.Success -> {
+                    _uiState.update { it.copy(isLoading = false) }
+                    _events.send(LoginUiEvent.NavigateToDashboard)
+                }
+                is Resource.Error -> _uiState.update { it.copy(isLoading = false, generalError = result.message) }
+                is Resource.Loading -> {}
+            }
         }
     }
 }

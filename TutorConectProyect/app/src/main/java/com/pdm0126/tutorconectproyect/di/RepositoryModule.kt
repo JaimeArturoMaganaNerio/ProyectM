@@ -1,81 +1,46 @@
-package com.tutorconnect.di
+package com.pdm0126.tutorconectproyect.di
 
-import com.tutorconnect.data.api.ApiService
-import com.tutorconnect.data.repository.*
+import com.pdm0126.tutorconectproyect.data.repository.*
+import dagger.Binds
 import dagger.Module
-import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object RepositoryModule {
+abstract class RepositoryModule {
 
-    private const val BASE_URL = "http://192.168.0.53:8000/"
-
-    @Provides
+    @Binds
     @Singleton
-    fun provideRetrofit(): Retrofit {
-        return Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-    }
+    abstract fun bindAuthRepository(
+        authRepositoryImpl: FirebaseAuthRepository
+    ): AuthRepository
 
-    @Provides
+    @Binds
     @Singleton
-    fun provideApiService(retrofit: Retrofit): ApiService {
-        return retrofit.create(ApiService::class.java)
-    }
+    abstract fun bindTutorRepository(
+        tutorRepositoryImpl: FirebaseTutorRepository
+    ): TutorRepository
 
-    @Provides
+    @Binds
     @Singleton
-    fun provideAuthRepository(api: ApiService): AuthRepository {
-        return DefaultAuthRepository(api)
-    }
+    abstract fun bindPostRepository(
+        postRepositoryImpl: FirebasePostRepository
+    ): PostRepository
 
-    @Provides
-    @Singleton
-    fun provideDashboardRepository(api: ApiService): DashboardRepository {
-        return DefaultDashboardRepository(api)
-    }
 
-    @Provides
+    @Binds
     @Singleton
-    fun provideTutorRepository(api: ApiService): TutorRepository {
-        return DefaultTutorRepository(api)
-    }
+    abstract fun bindBookingRepository(
+        bookingRepositoryImpl: FirebaseBookingRepository
+    ): BookingRepository
 
-    @Provides
+    @Binds
     @Singleton
-    fun provideChatRepository(api: ApiService): ChatRepository {
-        return DefaultChatRepository(api)
-    }
+    abstract fun bindChatRepository(
+        chatRepositoryImpl: FirebaseChatRepository
+    ): ChatRepository
 
-    @Provides
-    @Singleton
-    fun provideCalendarRepository(api: ApiService): CalendarRepository {
-        return DefaultCalendarRepository(api)
-    }
 
-    @Provides
-    @Singleton
-    fun provideBookingRepository(api: ApiService): BookingRepository {
-        return DefaultBookingRepository(api)
-    }
-
-    @Provides
-    @Singleton
-    fun providePostRepository(api: ApiService): PostRepository {
-        return DefaultPostRepository(api)
-    }
-
-    @Provides
-    @Singleton
-    fun provideProfileRepository(api: ApiService): ProfileRepository {
-        return DefaultProfileRepository(api)
-    }
 }

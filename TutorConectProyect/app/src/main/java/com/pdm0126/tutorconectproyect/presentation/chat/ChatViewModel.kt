@@ -1,21 +1,31 @@
-package com.tutorconnect.presentation.chat
+package com.pdm0126.tutorconectproyect.presentation.chat
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.tutorconnect.data.repository.ChatRepository
+import com.pdm0126.tutorconectproyect.data.model.ChatMessage
+import com.pdm0126.tutorconectproyect.data.repository.AuthRepository
+import com.pdm0126.tutorconectproyect.data.repository.ChatRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.Date
 import javax.inject.Inject
+import com.pdm0126.tutorconectproyect.presentation.chat.ChatViewModel
+import com.tutorconnect.domain.Resource
+import com.tutorconnect.presentation.chat.ChatUiAction
+import com.tutorconnect.presentation.chat.ChatUiEvent
+import com.tutorconnect.presentation.chat.ChatUiState
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
-    private val repository: ChatRepository,
+    private val chatRepository: ChatRepository,
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ChatUiState())
@@ -24,42 +34,52 @@ class ChatViewModel @Inject constructor(
     private val _events = Channel<ChatUiEvent>()
     val events = _events.receiveAsFlow()
 
-    private var tutorId: String = ""
-    private var loaded = false
+    private var currentUserId: String = ""
+    private var receiverUserId: String = ""
 
     fun onAction(action: ChatUiAction) {
         when (action) {
-            is ChatUiAction.Load -> load(action.tutorId)
+            is ChatUiAction.Load -> {
+                receiverUserId = action.tutorId
+                viewModelScope.launch {
+                    val user = authRepository.currentUser.firstOrNull()
+                    if (user != null) {
+                        currentUserId = user.id
+                        listenForMessages()
+                    }
+                }
+            }
             is ChatUiAction.DraftChanged -> _uiState.update { it.copy(draft = action.value) }
             ChatUiAction.Send -> send()
             ChatUiAction.Back -> viewModelScope.launch { _events.send(ChatUiEvent.Back) }
         }
     }
 
-    private fun load(id: String) {
-        if (loaded) return
-        loaded = true
-        tutorId = id
+    private fun listenForMessages() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-            val messages = repository.messages(id)
-            _uiState.update { it.copy(messages = messages.distinctBy { m -> m.id }, isLoading = false) }
-            _events.send(ChatUiEvent.ScrollToBottom)
+            chatRepository.getMessages(currentUserId, receiverUserId).collect { result ->
+                if (result is Resource.Success) {
+                    // Pasamos la lista tal cual porque la UI espera ChatMessage de Firebase
+                    _uiState.update { it.copy(messages = result.data ?: emptyList(), isLoading = false) }
+                    _events.send(ChatUiEvent.ScrollToBottom)
+                }
+            }
         }
     }
 
     private fun send() {
         val text = _uiState.value.draft.trim()
-        if (text.isEmpty()) return
+        if (text.isEmpty() || currentUserId.isEmpty()) return
+
         viewModelScope.launch {
-            val message = repository.send(tutorId, text)
-            _uiState.update { 
-                it.copy(
-                    messages = (it.messages + message).distinctBy { m -> m.id },
-                    draft = ""
-                ) 
-            }
-            _events.send(ChatUiEvent.ScrollToBottom)
+            val newMessage = ChatMessage(
+                senderId = currentUserId,
+                receiverId = receiverUserId,
+                message = text,
+                timestamp = Date() // Solucionado el error de fecha
+            )
+            _uiState.update { it.copy(draft = "") }
+            chatRepository.sendMessage(newMessage)
         }
     }
 }

@@ -1,78 +1,90 @@
-package com.tutorconnect.data.model
+package com.pdm0126.tutorconectproyect.data.model
 
-/** Rol del usuario — se guarda al registrarse y define qué ve en la app */
+import com.google.firebase.firestore.DocumentId
+import java.util.Date
+
+// Agrega esto en data/model/Models.kt
 enum class UserRole { TUTOR, TUTORADO }
 
-/** Disponibilidad del tutor en el directorio */
 enum class TutorStatus(val label: String) {
     ONLINE("En línea"),
     BUSY("Ocupado"),
     AVAILABLE("Disponible"),
 }
 
-data class UserProfile(
-    val id: String,
-    val fullName: String,
-    val institutionalEmail: String,
-    val career: String,
-    val role: UserRole = UserRole.TUTORADO,
+// Necesitamos este modelo visual para el Dashboard
+data class FeaturedPost(
+    val id: String = "",
+    val authorName: String = "",
+    val handle: String = "",
+    val question: String = "",
     val photoUrl: String? = null,
 )
 
-data class Subject(
-    val id: String,
-    val name: String,
-    val faculty: String,
-    val completed: Boolean = false,
-)
 
 data class Tutor(
-    val id: String,
-    val name: String,
-    val specialty: String,
-    val faculty: String,
-    val status: TutorStatus,
-    val photoUrl: String? = null,
-    val subjects: List<String> = emptyList(),
-    val schedule: List<String> = emptyList(),
-    val bio: String = "",
+    val id: String = "",
+    val name: String = "",
+    val subject: String = "",
     val rating: Double = 0.0,
+    val price: String = "Gratis",
+    val status: TutorStatus = TutorStatus.ONLINE,
+    val imageUrl: String? = null
 )
 
-data class FeaturedPost(
-    val id: String,
-    val authorName: String,
-    val handle: String,
-    val question: String,
-    val photoUrl: String? = null,
+data class UserProfile(
+    val id: String = "",
+    val fullName: String = "",
+    val institutionalEmail: String = "",
+    val career: String = "",
+    val role: UserRole = UserRole.TUTORADO
+)
+// Usuario genérico (Puede ser Tutor o Estudiante)
+data class User(
+    @DocumentId val id: String = "",
+    val uid: String = "", // Firebase Auth UID
+    val name: String = "",
+    val email: String = "",
+    val role: String = "STUDENT", // "STUDENT" o "TUTOR"
+    val profileImageUrl: String = "",
+    val bio: String = "",
+    val subjects: List<String> = emptyList(), // Materias que imparte si es tutor
+    val rating: Double = 0.0
+)
+
+data class Post(
+    @DocumentId val id: String = "",
+    val authorId: String = "",
+    val authorName: String = "",
+    val title: String = "",
+    val content: String = "",
+    val fileUrl: String = "", // URL del PDF/Imagen en Firebase Storage
+    val timestamp: Date = Date(),
+    val tags: List<String> = emptyList()
+)
+
+data class Booking(
+    @DocumentId val id: String = "",
+    val studentId: String = "",
+    val tutorId: String = "",
+    val subject: String = "",
+    val date: Date = Date(),
+    val status: String = "PENDING", // PENDING, ACCEPTED, REJECTED, COMPLETED
+    val notes: String = ""
 )
 
 data class ChatMessage(
-    val id: String,
-    val text: String,
-    val fromMe: Boolean,
-    val timestamp: String,
+    @DocumentId val id: String = "",
+    val senderId: String = "",
+    val receiverId: String = "",
+    val message: String = "",
+    val timestamp: Date = Date()
 )
 
-data class TutoringSession(
-    val id: String,
-    val tutorName: String,
-    val subject: String,
-    val date: String,
-    val time: String,
-    val confirmed: Boolean = false,
+data class UiChatMessage(
+    val id: String = "",
+    val text: String = "",
+    val fromMe: Boolean = false,
+    val timestamp: String = ""
 )
 
-data class BookingRequest(
-    val tutorId: String,
-    val subject: String,
-    val date: String,
-    val time: String,
-    val comments: String,
-)
-
-data class NewPost(
-    val title: String,
-    val description: String,
-    val attachmentName: String? = null,
-)

@@ -1,77 +1,51 @@
-package com.tutorconnect.core.navigation
+package com.pdm0126.tutorconectproyect.core.navigation
 
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.School
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
-import androidx.navigation3.runtime.NavKey
-import androidx.navigation3.runtime.rememberNavBackStack
-import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
-import androidx.navigation3.ui.NavDisplay
-
-private data class TabItem(
-    val destination: AppDestinations,
-    val label: String,
-    val icon: ImageVector,
-)
-
-private val bottomTabs = listOf(
-    TabItem(AppDestinations.Dashboard,  "Inicio",     Icons.Filled.Home),
-    TabItem(AppDestinations.Tutors,     "Tutores",    Icons.Filled.School),
-    TabItem(AppDestinations.CreatePost, "Publicar",   Icons.Filled.AddCircle),
-    TabItem(AppDestinations.Calendar,   "Calendario", Icons.Filled.CalendarMonth),
-    TabItem(AppDestinations.Profile,    "Perfil",     Icons.Filled.Person),
-)
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.pdm0126.tutorconectproyect.presentation.login.LoginScreen
+import com.pdm0126.tutorconectproyect.presentation.dashboard.DashboardScreen
+import com.pdm0126.tutorconectproyect.presentation.post.CreatePostScreen
+import com.tutorconnect.presentation.dashboard.DashboardScreen
+import com.tutorconnect.presentation.login.LoginScreen
+import com.tutorconnect.presentation.post.CreatePostScreen
 
 @Composable
 fun AppNavigation() {
-    val backStack = rememberNavBackStack(AppDestinations.Login)
-    val navigator = remember(backStack) { AppNavigator(backStack) }
+    // Inicializamos el stack de navegación en el Login
+    val backStack = rememberNavBackStack(initialRoute = AppRoute.Login)
 
-    val current: NavKey? = backStack.lastOrNull()
-    val showBottomBar = bottomTabs.any { it.destination == current }
+    NavDisplay(
+        backstack = backStack,
+        entryProvider = entryProvider {
 
-    // Decoradores para manejar el estado guardado y los ViewModels por cada entrada
-    val decorators = listOf(
-        rememberSaveableStateHolderNavEntryDecorator(),
-        rememberViewModelStoreNavEntryDecorator<NavKey>()
-    )
-
-    Scaffold(
-        bottomBar = {
-            if (showBottomBar) {
-                NavigationBar {
-                    bottomTabs.forEach { tab ->
-                        NavigationBarItem(
-                            selected = current == tab.destination,
-                            onClick = { navigator.switchTab(tab.destination) },
-                            icon = { Icon(tab.icon, contentDescription = tab.label) },
-                            label = { Text(tab.label) },
-                        )
+            route<AppRoute.Login> {
+                LoginScreen(
+                    viewModel = hiltViewModel(),
+                    onLoginSuccess = {
+                        // Limpiamos el backstack al ir al dashboard para no volver al login con el botón de "atrás"
+                        backStack.clear()
+                        backStack.push(AppRoute.Dashboard)
                     }
-                }
+                )
             }
-        },
-    ) { innerPadding ->
-        NavDisplay(
-            backStack = backStack,
-            onBack = { navigator.pop() },
-            entryDecorators = decorators,
-            modifier = Modifier.padding(innerPadding),
-            entryProvider = appEntryProvider(navigator),
-        )
-    }
+
+            route<AppRoute.Dashboard> {
+                DashboardScreen(
+                    viewModel = hiltViewModel(),
+                    onNavigateToTutors = { backStack.push(AppRoute.Tutors) },
+                    onNavigateToCreatePost = { backStack.push(AppRoute.CreatePost) }
+                )
+            }
+
+            route<AppRoute.CreatePost> {
+                CreatePostScreen(
+                    viewModel = hiltViewModel(),
+                    onPostCreated = { backStack.pop() },
+                    onNavigateBack = { backStack.pop() }
+                )
+            }
+
+            // Aquí se irán agregando las demás rutas (Chat, TutorDetail) a medida que ajustemos sus ViewModels
+        }
+    )
 }

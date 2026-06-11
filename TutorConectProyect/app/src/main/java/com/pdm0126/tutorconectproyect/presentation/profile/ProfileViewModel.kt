@@ -1,21 +1,27 @@
-package com.tutorconnect.presentation.profile
+package com.pdm0126.tutorconectproyect.presentation.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.tutorconnect.data.repository.ProfileRepository
+import com.pdm0126.tutorconectproyect.data.model.UserRole
+import com.pdm0126.tutorconectproyect.data.repository.AuthRepository
+import com.tutorconnect.presentation.profile.ProfileUiAction
+import com.tutorconnect.presentation.profile.ProfileUiEvent
+import com.tutorconnect.presentation.profile.ProfileUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.pdm0126.tutorconectproyect.data.model.UserProfile
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
-    private val repository: ProfileRepository,
+    private val authRepository: AuthRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProfileUiState())
@@ -29,9 +35,7 @@ class ProfileViewModel @Inject constructor(
     fun onAction(action: ProfileUiAction) {
         when (action) {
             ProfileUiAction.Retry -> load()
-            ProfileUiAction.EditProfile -> viewModelScope.launch {
-                _events.send(ProfileUiEvent.ShowMessage("Edición de perfil próximamente."))
-            }
+            ProfileUiAction.EditProfile -> viewModelScope.launch { _events.send(ProfileUiEvent.ShowMessage("Próximamente")) }
             ProfileUiAction.Logout -> logout()
         }
     }
@@ -39,16 +43,28 @@ class ProfileViewModel @Inject constructor(
     private fun load() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
-            runCatching { repository.currentUser() }
-                .onSuccess { user -> _uiState.update { it.copy(user = user, isLoading = false) } }
-                .onFailure { e -> _uiState.update { it.copy(isLoading = false, error = e.message) } }
+            val user = authRepository.currentUser.firstOrNull()
+
+            if (user != null) {
+                // Adaptamos el 'User' de Firebase al 'UserProfile' que pide tu UI
+                val profile = UserProfile(
+                    id = user.id,
+                    fullName = user.name,
+                    institutionalEmail = user.email,
+                    career = "Ingeniería", // Dato por defecto
+                    role = if (user.role == "TUTOR") UserRole.TUTOR else UserRole.TUTORADO
+                )
+                _uiState.update { it.copy(user = profile, isLoading = false) }
+            } else {
+                _uiState.update { it.copy(isLoading = false, error = "Usuario no encontrado") }
+            }
         }
     }
 
     private fun logout() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoggingOut = true) }
-            runCatching { repository.logout() }
+            authRepository.logout()
             _uiState.update { it.copy(isLoggingOut = false) }
             _events.send(ProfileUiEvent.LoggedOut)
         }

@@ -1,56 +1,39 @@
-package com.tutorconnect.data.repository
+package com.pdm0126.tutorconectproyect.data.repository
 
-import com.tutorconnect.data.model.BookingRequest
-import com.tutorconnect.data.model.ChatMessage
-import com.tutorconnect.data.model.FeaturedPost
-import com.tutorconnect.data.model.NewPost
-import com.tutorconnect.data.model.Subject
-import com.tutorconnect.data.model.Tutor
-import com.tutorconnect.data.model.TutoringSession
-import com.tutorconnect.data.model.UserProfile
-
-/* ─────────────────────────────────────────────────────────────────────────────
- *  CONTRATOS DE REPOSITORIO
- *  Solo interfaces. Las implementaciones reales van contra MongoDB/backend.
- *  Para conectar: implementa cada interfaz y regístrala en di/RepositoryModule.kt
- * ──────────────────────────────────────────────────────────────────────────── */
+import com.pdm0126.tutorconectproyect.data.model.Booking
+import com.pdm0126.tutorconectproyect.data.model.ChatMessage
+import com.pdm0126.tutorconectproyect.data.model.Post
+import com.pdm0126.tutorconectproyect.data.model.User
+import com.tutorconnect.domain.Resource
+import kotlinx.coroutines.flow.Flow
 
 interface AuthRepository {
-    suspend fun login(email: String, password: String): Result<UserProfile>
-    suspend fun loginWithMicrosoft(): Result<UserProfile>
-}
-
-interface DashboardRepository {
-    suspend fun tutorSubjects(): List<Subject>
-    suspend fun additionalLoad(): List<Subject>
-    suspend fun featuredPosts(): List<FeaturedPost>
+    val currentUser: Flow<User?>
+    suspend fun login(email: String, pass: String): Resource<User>
+    suspend fun register(email: String, pass: String, name: String, isTutor: Boolean): Resource<User>
+    suspend fun logout(): Resource<Unit>
 }
 
 interface TutorRepository {
-    suspend fun tutors(): List<Tutor>
-    suspend fun tutorById(id: String): Tutor?
-    suspend fun faculties(): List<String>
-    suspend fun subjects(): List<String>
-}
-
-interface ChatRepository {
-    suspend fun messages(tutorId: String): List<ChatMessage>
-    suspend fun send(tutorId: String, text: String): ChatMessage
-}
-
-interface CalendarRepository {
-    suspend fun sessions(): List<TutoringSession>
-}
-
-interface BookingRepository {
-    suspend fun book(request: BookingRequest): Result<TutoringSession>
+    suspend fun getAllTutors(): Resource<List<User>>
+    suspend fun getTutorById(tutorId: String): Resource<User>
 }
 
 interface PostRepository {
-    suspend fun publish(post: NewPost): Result<Unit>
+    suspend fun getAllPosts(): Resource<List<Post>>
+    suspend fun createPost(post: Post): Resource<Unit>
 }
 
-interface ProfileRepository {
-    suspend fun currentUser(): UserProfile
-    suspend fun logout()
+interface BookingRepository {
+    suspend fun createBooking(booking: Booking): Resource<Unit>
+    // Un solo método inteligente: Si es tutor busca donde él es tutor, si es estudiante busca sus solicitudes
+    suspend fun getBookingsForUser(userId: String, isTutor: Boolean): Resource<List<Booking>>
+    suspend fun updateBookingStatus(bookingId: String, newStatus: String): Resource<Unit>
+}
+
+interface ChatRepository {
+    suspend fun sendMessage(message: ChatMessage): Resource<Unit>
+    // NOTA TÉCNICA: Usamos Flow en lugar de 'suspend' porque un chat
+    // necesita emitir datos en tiempo real cada vez que llega un mensaje nuevo.
+    fun getMessages(userId1: String, userId2: String): Flow<Resource<List<ChatMessage>>>
 }

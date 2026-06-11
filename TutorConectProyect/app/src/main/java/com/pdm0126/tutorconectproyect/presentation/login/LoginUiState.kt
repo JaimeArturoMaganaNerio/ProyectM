@@ -1,6 +1,7 @@
 package com.tutorconnect.presentation.login
 
-import com.tutorconnect.data.model.UserRole
+import com.pdm0126.tutorconectproyect.data.model.UserRole
+
 
 data class LoginUiState(
     val email: String = "",

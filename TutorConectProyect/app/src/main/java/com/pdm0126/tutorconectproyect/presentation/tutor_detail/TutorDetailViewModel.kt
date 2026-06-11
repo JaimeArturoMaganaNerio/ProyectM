@@ -1,8 +1,12 @@
-package com.tutorconnect.presentation.tutor_detail
+package com.pdm0126.tutorconectproyect.presentation.tutor_detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.tutorconnect.data.repository.TutorRepository
+import com.pdm0126.tutorconectproyect.data.repository.TutorRepository
+import com.tutorconnect.domain.Resource
+import com.tutorconnect.presentation.tutor_detail.TutorDetailUiAction
+import com.tutorconnect.presentation.tutor_detail.TutorDetailUiEvent
+import com.tutorconnect.presentation.tutor_detail.TutorDetailUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,7 +19,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TutorDetailViewModel @Inject constructor(
-    private val repository: TutorRepository,
+    private val tutorRepository: TutorRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(TutorDetailUiState())
@@ -24,35 +28,38 @@ class TutorDetailViewModel @Inject constructor(
     private val _events = Channel<TutorDetailUiEvent>()
     val events = _events.receiveAsFlow()
 
-    private var loadedId: String? = null
-
     fun onAction(action: TutorDetailUiAction) {
         when (action) {
-            is TutorDetailUiAction.Load -> load(action.tutorId)
-            TutorDetailUiAction.SendNudge -> emit(TutorDetailUiEvent.ShowMessage("¡Nudge enviado al tutor!"))
-            TutorDetailUiAction.OpenChat -> _uiState.value.tutor?.let {
-                emit(TutorDetailUiEvent.OpenChat(it.id, it.name))
-            }
-            TutorDetailUiAction.Book -> _uiState.value.tutor?.let {
-                emit(TutorDetailUiEvent.Book(it.id, it.name))
-            }
-            TutorDetailUiAction.Back -> emit(TutorDetailUiEvent.Back)
+            is TutorDetailUiAction.LoadTutor -> loadTutor(action.tutorId)
+            TutorDetailUiAction.BookSession -> viewModelScope.launch { _events.send(TutorDetailUiEvent.NavigateToBooking) }
+            TutorDetailUiAction.StartChat -> viewModelScope.launch { _events.send(TutorDetailUiEvent.NavigateToChat) }
+            TutorDetailUiAction.Back -> viewModelScope.launch { _events.send(TutorDetailUiEvent.NavigateBack) }
         }
     }
 
-    private fun emit(event: TutorDetailUiEvent) = viewModelScope.launch { _events.send(event) }
-
-    private fun load(tutorId: String) {
-        if (loadedId == tutorId) return
-        loadedId = tutorId
+    private fun loadTutor(tutorId: String) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
-            runCatching { repository.tutorById(tutorId) }
-                .onSuccess { tutor ->
-                    if (tutor != null) _uiState.update { it.copy(tutor = tutor, isLoading = false) }
-                    else _uiState.update { it.copy(isLoading = false, error = "Tutor no encontrado.") }
+
+            when (val result = tutorRepository.getTutorById(tutorId)) {
+                is Resource.Success -> {
+                    val user = result.data
+                    if (user != null) {
+                        val mappedTutor = com.pdm0126.tutorconectproyect.data.model.Tutor(
+                            id = user.id,
+                            name = user.name,
+                            subject = user.subjects.firstOrNull() ?: "General",
+                            rating = user.rating,
+                            imageUrl = user.profileImageUrl
+                        )
+                        _uiState.update { it.copy(isLoading = false, tutor = mappedTutor) }
+                    }
                 }
-                .onFailure { e -> _uiState.update { it.copy(isLoading = false, error = e.message) } }
+                is Resource.Error -> {
+                    _uiState.update { it.copy(isLoading = false, error = result.message) }
+                }
+                is Resource.Loading -> {}
+            }
         }
     }
 }

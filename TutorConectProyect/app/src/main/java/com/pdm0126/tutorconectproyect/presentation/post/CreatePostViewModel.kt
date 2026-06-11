@@ -1,22 +1,30 @@
-package com.tutorconnect.presentation.post
+package com.pdm0126.tutorconectproyect.presentation.post
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.tutorconnect.data.model.NewPost
-import com.tutorconnect.data.repository.PostRepository
+import com.pdm0126.tutorconectproyect.data.model.Post
+import com.pdm0126.tutorconectproyect.data.repository.AuthRepository
+import com.pdm0126.tutorconectproyect.data.repository.PostRepository
+import com.tutorconnect.domain.Resource
+import com.tutorconnect.presentation.post.CreatePostUiAction
+import com.tutorconnect.presentation.post.CreatePostUiEvent
+import com.tutorconnect.presentation.post.CreatePostUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.Date
 import javax.inject.Inject
 
 @HiltViewModel
 class CreatePostViewModel @Inject constructor(
     private val repository: PostRepository,
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CreatePostUiState())
@@ -29,9 +37,7 @@ class CreatePostViewModel @Inject constructor(
         when (action) {
             is CreatePostUiAction.TitleChanged -> _uiState.update { it.copy(title = action.value) }
             is CreatePostUiAction.DescriptionChanged -> _uiState.update { it.copy(description = action.value) }
-            CreatePostUiAction.AttachFile -> _uiState.update {
-                it.copy(attachmentName = "documento_adjunto.pdf")
-            }
+            CreatePostUiAction.AttachFile -> _uiState.update { it.copy(attachmentName = "documento.pdf") }
             CreatePostUiAction.RemoveAttachment -> _uiState.update { it.copy(attachmentName = null) }
             CreatePostUiAction.Submit -> submit()
         }
@@ -43,23 +49,30 @@ class CreatePostViewModel @Inject constructor(
             _uiState.update { it.copy(showErrors = true) }
             return
         }
+
         viewModelScope.launch {
             _uiState.update { it.copy(isSubmitting = true) }
-            val post = NewPost(
+            val user = authRepository.currentUser.firstOrNull()
+
+            val post = Post(
+                authorId = user?.id ?: "",
+                authorName = user?.name ?: "Usuario",
                 title = current.title.trim(),
-                description = current.description.trim(),
-                attachmentName = current.attachmentName,
+                content = current.description.trim(), // Tu UI le llama description, Firebase le llama content
+                timestamp = Date()
             )
-            repository.publish(post)
-                .onSuccess {
+
+            when (val result = repository.createPost(post)) {
+                is Resource.Success -> {
                     _uiState.update { CreatePostUiState() }
-                    _events.send(CreatePostUiEvent.ShowMessage("¡Publicación creada!"))
                     _events.send(CreatePostUiEvent.Published)
                 }
-                .onFailure { e ->
+                is Resource.Error -> {
                     _uiState.update { it.copy(isSubmitting = false) }
-                    _events.send(CreatePostUiEvent.ShowMessage(e.message ?: "No se pudo publicar."))
+                    _events.send(CreatePostUiEvent.ShowMessage(result.message))
                 }
+                is Resource.Loading -> {}
+            }
         }
     }
 }
