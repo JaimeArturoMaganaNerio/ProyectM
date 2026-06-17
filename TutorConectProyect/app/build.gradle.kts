@@ -9,11 +9,11 @@ plugins {
 }
 
 android {
-    namespace = "com.pdm0126.tutorconectproyect"
+    namespace = "com.pdm0126.tutorconnectproyect"
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "com.pdm0126.tutorconectproyect"
+        applicationId = "com.pdm0126.tutorconnectproyect"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
