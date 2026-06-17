@@ -3,7 +3,6 @@ package com.pdm0126.tutorconnectproyect.data.model
 import com.google.firebase.firestore.DocumentId
 import java.util.Date
 
-// Agrega esto en data/model/Models.kt
 enum class UserRole { TUTOR, TUTORADO }
 
 enum class TutorStatus(val label: String) {
@@ -12,24 +11,28 @@ enum class TutorStatus(val label: String) {
     AVAILABLE("Disponible"),
 }
 
-// Necesitamos este modelo visual para el Dashboard
+// Modelo visual para el Dashboard y Listas
 data class FeaturedPost(
     val id: String = "",
     val authorName: String = "",
-    val handle: String = "",
+    val handle: String = "@uca.edu.sv",
     val question: String = "",
     val photoUrl: String? = null,
 )
 
-
 data class Tutor(
     val id: String = "",
     val name: String = "",
-    val subject: String = "",
+    val specialty: String = "Tutor UCA",
+    val faculty: String = "Facultad de Ingeniería",
+    val subjects: List<String> = emptyList(),
+    val bio: String = "Estudiante de excelencia académica dispuesto a ayudarte.",
+    val schedule: List<String> = listOf("Lunes 10:00 - 12:00", "Miércoles 14:00 - 16:00"),
     val rating: Double = 0.0,
     val price: String = "Gratis",
     val status: TutorStatus = TutorStatus.ONLINE,
-    val imageUrl: String? = null
+    val photoUrl: String? = null,
+    val imageUrl: String? = null // Para compatibilidad
 )
 
 data class UserProfile(
@@ -37,18 +40,20 @@ data class UserProfile(
     val fullName: String = "",
     val institutionalEmail: String = "",
     val career: String = "",
-    val role: UserRole = UserRole.TUTORADO
+    val role: UserRole = UserRole.TUTORADO,
+    val photoUrl: String? = null
 )
-// Usuario genérico (Puede ser Tutor o Estudiante)
+
+// Usuario genérico (Firebase Auth / Firestore)
 data class User(
     @DocumentId val id: String = "",
-    val uid: String = "", // Firebase Auth UID
+    val uid: String = "",
     val name: String = "",
     val email: String = "",
     val role: String = "STUDENT", // "STUDENT" o "TUTOR"
     val profileImageUrl: String = "",
     val bio: String = "",
-    val subjects: List<String> = emptyList(), // Materias que imparte si es tutor
+    val subjects: List<String> = emptyList(),
     val rating: Double = 0.0
 )
 
@@ -58,7 +63,7 @@ data class Post(
     val authorName: String = "",
     val title: String = "",
     val content: String = "",
-    val fileUrl: String = "", // URL del PDF/Imagen en Firebase Storage
+    val fileUrl: String = "",
     val timestamp: Date = Date(),
     val tags: List<String> = emptyList()
 )
@@ -67,10 +72,10 @@ data class Booking(
     @DocumentId val id: String = "",
     val studentId: String = "",
     val tutorId: String = "",
-    val tutorName: String = "", // Para mostrarlo rápido en el calendario
+    val tutorName: String = "",
     val subject: String = "",
-    val date: String = "", // Ajustado a String para tu UI
-    val time: String = "", // Ajustado a String para tu UI
+    val date: String = "",
+    val time: String = "",
     val status: String = "PENDING",
     val notes: String = ""
 )
@@ -80,7 +85,8 @@ data class ChatMessage(
     val senderId: String = "",
     val receiverId: String = "",
     val message: String = "",
-    val timestamp: Date = Date()
+    val timestamp: Date = Date(),
+    val fromMe: Boolean = false // Auxiliar para UI
 )
 
 data class UiChatMessage(
@@ -93,9 +99,10 @@ data class UiChatMessage(
 data class TutoringSession(
     val id: String = "",
     val title: String = "",
+    val subject: String = "", // Added subject
     val tutorName: String = "",
     val date: String = "",
     val time: String = "",
-    val status: String = ""
+    val status: String = "PENDING",
+    val confirmed: Boolean = false // Added confirmed
 )
-

@@ -5,10 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.pdm0126.tutorconnectproyect.data.model.Post
 import com.pdm0126.tutorconnectproyect.data.repository.AuthRepository
 import com.pdm0126.tutorconnectproyect.data.repository.PostRepository
-import com.tutorconnect.domain.Resource
-import com.tutorconnect.presentation.post.CreatePostUiAction
-import com.tutorconnect.presentation.post.CreatePostUiEvent
-import com.tutorconnect.presentation.post.CreatePostUiState
+import com.pdm0126.tutorconnectproyect.domain.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow

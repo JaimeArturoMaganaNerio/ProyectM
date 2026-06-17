@@ -5,9 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.pdm0126.tutorconnectproyect.data.model.Booking
 import com.pdm0126.tutorconnectproyect.data.repository.AuthRepository
 import com.pdm0126.tutorconnectproyect.data.repository.BookingRepository
-import com.tutorconnect.presentation.booking.BookingUiAction
-import com.tutorconnect.presentation.booking.BookingUiEvent
-import com.tutorconnect.presentation.booking.BookingUiState
+import com.pdm0126.tutorconnectproyect.domain.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +16,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import com.tutorconnect.domain.Resource
 
 @HiltViewModel
 class BookingViewModel @Inject constructor(
@@ -94,7 +91,7 @@ class BookingViewModel @Inject constructor(
                 }
                 is Resource.Error -> {
                     _uiState.update { it.copy(isSubmitting = false) }
-                    _events.send(BookingUiEvent.ShowMessage(result.message ?: "No se pudo reservar."))
+                    _events.send(BookingUiEvent.ShowMessage(result.message))
                 }
                 is Resource.Loading -> {}
             }

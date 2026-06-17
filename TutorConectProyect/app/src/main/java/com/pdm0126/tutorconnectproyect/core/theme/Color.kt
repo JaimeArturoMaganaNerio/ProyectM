@@ -1,4 +1,4 @@
-package com.tutorconnect.core.theme
+package com.pdm0126.tutorconnectproyect.core.theme
 
 import androidx.compose.ui.graphics.Color
 

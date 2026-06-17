@@ -1,6 +1,6 @@
-package com.tutorconnect.presentation.tutor_detail
+package com.pdm0126.tutorconnectproyect.presentation.tutor_detail
 
-import com.tutorconnect.data.model.Tutor
+import com.pdm0126.tutorconnectproyect.data.model.Tutor
 
 data class TutorDetailUiState(
     val tutor: Tutor? = null,

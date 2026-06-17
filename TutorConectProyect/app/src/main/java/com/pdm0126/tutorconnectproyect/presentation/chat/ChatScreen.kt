@@ -1,4 +1,4 @@
-package com.tutorconnect.presentation.chat
+package com.pdm0126.tutorconnectproyect.presentation.chat
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -33,7 +33,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.tutorconnect.data.model.ChatMessage
+import com.pdm0126.tutorconnectproyect.data.model.ChatMessage
 import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -118,9 +118,9 @@ private fun MessageBubble(message: ChatMessage) {
             modifier = Modifier.widthIn(max = 280.dp),
         ) {
             Column(Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
-                Text(message.text, color = textColor, style = MaterialTheme.typography.bodyMedium)
+                Text(message.message, color = textColor, style = MaterialTheme.typography.bodyMedium)
                 Text(
-                    message.timestamp,
+                    message.timestamp.toString(),
                     color = textColor.copy(alpha = 0.7f),
                     style = MaterialTheme.typography.labelMedium,
                     textAlign = TextAlign.End,

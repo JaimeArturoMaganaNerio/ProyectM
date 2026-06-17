@@ -2,11 +2,9 @@ package com.pdm0126.tutorconnectproyect.presentation.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.pdm0126.tutorconnectproyect.data.model.UserProfile
 import com.pdm0126.tutorconnectproyect.data.model.UserRole
 import com.pdm0126.tutorconnectproyect.data.repository.AuthRepository
-import com.tutorconnect.presentation.profile.ProfileUiAction
-import com.tutorconnect.presentation.profile.ProfileUiEvent
-import com.tutorconnect.presentation.profile.ProfileUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +15,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import com.pdm0126.tutorconnectproyect.data.model.UserProfile
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
@@ -52,7 +49,8 @@ class ProfileViewModel @Inject constructor(
                     fullName = user.name,
                     institutionalEmail = user.email,
                     career = "Ingeniería", // Dato por defecto
-                    role = if (user.role == "TUTOR") UserRole.TUTOR else UserRole.TUTORADO
+                    role = if (user.role == "TUTOR") UserRole.TUTOR else UserRole.TUTORADO,
+                    photoUrl = user.profileImageUrl
                 )
                 _uiState.update { it.copy(user = profile, isLoading = false) }
             } else {

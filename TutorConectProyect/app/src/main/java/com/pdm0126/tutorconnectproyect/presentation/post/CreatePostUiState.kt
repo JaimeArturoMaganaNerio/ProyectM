@@ -1,4 +1,4 @@
-package com.tutorconnect.presentation.post
+package com.pdm0126.tutorconnectproyect.presentation.post
 
 data class CreatePostUiState(
     val title: String = "",

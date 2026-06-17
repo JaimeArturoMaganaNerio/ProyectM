@@ -29,7 +29,6 @@ abstract class RepositoryModule {
         postRepositoryImpl: FirebasePostRepository
     ): PostRepository
 
-
     @Binds
     @Singleton
     abstract fun bindBookingRepository(
@@ -41,6 +40,4 @@ abstract class RepositoryModule {
     abstract fun bindChatRepository(
         chatRepositoryImpl: FirebaseChatRepository
     ): ChatRepository
-
-
 }

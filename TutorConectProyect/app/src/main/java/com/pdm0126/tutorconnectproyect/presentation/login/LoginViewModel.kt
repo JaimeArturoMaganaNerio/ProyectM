@@ -2,15 +2,10 @@ package com.pdm0126.tutorconnectproyect.presentation.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-
+import com.pdm0126.tutorconnectproyect.core.utils.Validators
 import com.pdm0126.tutorconnectproyect.data.model.UserRole
 import com.pdm0126.tutorconnectproyect.data.repository.AuthRepository
-import com.tutorconnect.core.utils.Validators
-import com.tutorconnect.domain.Resource
-import com.tutorconnect.presentation.login.LoginUiAction
-import com.tutorconnect.presentation.login.LoginUiEvent
-import com.tutorconnect.presentation.login.LoginUiState
-
+import com.pdm0126.tutorconnectproyect.domain.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -1,4 +1,4 @@
-package com.tutorconnect.presentation.login
+package com.pdm0126.tutorconnectproyect.presentation.login
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
@@ -56,12 +56,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.tutorconnect.core.components.AppTextField
-import com.tutorconnect.core.components.PrimaryButton
-import com.tutorconnect.core.theme.UcaAccent
-import com.tutorconnect.core.theme.UcaNavy
-import com.tutorconnect.core.theme.UcaNavyDark
-import com.tutorconnect.data.model.UserRole
+import com.pdm0126.tutorconnectproyect.core.components.AppTextField
+import com.pdm0126.tutorconnectproyect.core.components.PrimaryButton
+import com.pdm0126.tutorconnectproyect.core.theme.UcaAccent
+import com.pdm0126.tutorconnectproyect.core.theme.UcaNavy
+import com.pdm0126.tutorconnectproyect.core.theme.UcaNavyDark
+import com.pdm0126.tutorconnectproyect.data.model.UserRole
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -139,7 +139,7 @@ fun LoginScreen(
                 // Card principal con animación de contenido
                 Card(
                     shape = RoundedCornerShape(24.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                     elevation = CardDefaults.cardElevation(16.dp),
                     modifier = Modifier.fillMaxWidth(),
                 ) {

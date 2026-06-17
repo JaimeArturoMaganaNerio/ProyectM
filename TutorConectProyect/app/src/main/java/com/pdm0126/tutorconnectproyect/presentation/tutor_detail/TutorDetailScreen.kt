@@ -1,4 +1,4 @@
-package com.tutorconnect.presentation.tutor_detail
+package com.pdm0126.tutorconnectproyect.presentation.tutor_detail
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -35,10 +35,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.tutorconnect.core.components.Avatar
-import com.tutorconnect.core.components.ErrorState
-import com.tutorconnect.core.components.LoadingState
-import com.tutorconnect.core.components.StatusChip
+import com.pdm0126.tutorconnectproyect.core.components.Avatar
+import com.pdm0126.tutorconnectproyect.core.components.ErrorState
+import com.pdm0126.tutorconnectproyect.core.components.LoadingState
+import com.pdm0126.tutorconnectproyect.core.components.StatusChip
 import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)

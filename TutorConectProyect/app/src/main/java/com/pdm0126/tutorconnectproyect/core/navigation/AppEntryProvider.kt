@@ -1,20 +1,20 @@
-package com.tutorconnect.core.navigation
+package com.pdm0126.tutorconnectproyect.core.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
-import com.tutorconnect.presentation.booking.BookingScreen
-import com.tutorconnect.presentation.calendar.CalendarScreen
-import com.tutorconnect.presentation.chat.ChatScreen
-import com.tutorconnect.presentation.dashboard.DashboardScreen
-import com.tutorconnect.presentation.login.LoginScreen
-import com.tutorconnect.presentation.post.CreatePostScreen
-import com.tutorconnect.presentation.profile.ProfileScreen
-import com.tutorconnect.presentation.tutor_detail.TutorDetailScreen
-import com.tutorconnect.presentation.tutor_home.TutorDashboardScreen
-import com.tutorconnect.presentation.tutors.TutorsScreen
+import com.pdm0126.tutorconnectproyect.presentation.booking.BookingScreen
+import com.pdm0126.tutorconnectproyect.presentation.calendar.CalendarScreen
+import com.pdm0126.tutorconnectproyect.presentation.chat.ChatScreen
+import com.pdm0126.tutorconnectproyect.presentation.dashboard.DashboardScreen
+import com.pdm0126.tutorconnectproyect.presentation.login.LoginScreen
+import com.pdm0126.tutorconnectproyect.presentation.post.CreatePostScreen
+import com.pdm0126.tutorconnectproyect.presentation.profile.ProfileScreen
+import com.pdm0126.tutorconnectproyect.presentation.tutor_detail.TutorDetailScreen
+import com.pdm0126.tutorconnectproyect.presentation.tutor_home.TutorDashboardScreen
+import com.pdm0126.tutorconnectproyect.presentation.tutors.TutorsScreen
 
 @Composable
 fun appEntryProvider(navigator: AppNavigator): (NavKey) -> NavEntry<NavKey> =

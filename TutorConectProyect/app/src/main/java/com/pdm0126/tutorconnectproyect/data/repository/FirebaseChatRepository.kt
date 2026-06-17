@@ -7,7 +7,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
-import com.tutorconnect.domain.Resource
+import com.pdm0126.tutorconnectproyect.domain.Resource
 import javax.inject.Inject
 
 class FirebaseChatRepository @Inject constructor(

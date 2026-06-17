@@ -1,4 +1,4 @@
-package com.tutorconnect.presentation.calendar
+package com.pdm0126.tutorconnectproyect.presentation.calendar
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -32,10 +32,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.tutorconnect.core.components.EmptyState
-import com.tutorconnect.core.components.ErrorState
-import com.tutorconnect.core.components.LoadingState
-import com.tutorconnect.data.model.TutoringSession
+import com.pdm0126.tutorconnectproyect.core.components.EmptyState
+import com.pdm0126.tutorconnectproyect.core.components.ErrorState
+import com.pdm0126.tutorconnectproyect.core.components.LoadingState
+import com.pdm0126.tutorconnectproyect.data.model.TutoringSession
 import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)

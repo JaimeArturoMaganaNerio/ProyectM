@@ -5,10 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.pdm0126.tutorconnectproyect.data.model.TutoringSession
 import com.pdm0126.tutorconnectproyect.data.repository.AuthRepository
 import com.pdm0126.tutorconnectproyect.data.repository.BookingRepository
-import com.tutorconnect.domain.Resource
-import com.tutorconnect.presentation.calendar.CalendarUiAction
-import com.tutorconnect.presentation.calendar.CalendarUiEvent
-import com.tutorconnect.presentation.calendar.CalendarUiState
+import com.pdm0126.tutorconnectproyect.domain.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -60,7 +57,7 @@ class CalendarViewModel @Inject constructor(
             when (val result = bookingRepository.getBookingsForUser(currentUser.id, isTutor)) {
                 is Resource.Success -> {
                     // 3. Traducir 'Booking' (Firebase) a 'TutoringSession' (Tu UI)
-                    val sessions = result.data?.map { booking ->
+                    val sessions = result.data.map { booking ->
                         TutoringSession(
                             id = booking.id,
                             title = booking.subject,
@@ -69,7 +66,7 @@ class CalendarViewModel @Inject constructor(
                             time = booking.time,
                             status = booking.status
                         )
-                    } ?: emptyList()
+                    }
 
                     _uiState.update { it.copy(sessions = sessions, isLoading = false) }
                 }

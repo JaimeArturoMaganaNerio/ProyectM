@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.pdm0126.tutorconnectproyect.data.model.ChatMessage
 import com.pdm0126.tutorconnectproyect.data.repository.AuthRepository
 import com.pdm0126.tutorconnectproyect.data.repository.ChatRepository
+import com.pdm0126.tutorconnectproyect.domain.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,10 +17,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.Date
 import javax.inject.Inject
-import com.tutorconnect.domain.Resource
-import com.tutorconnect.presentation.chat.ChatUiAction
-import com.tutorconnect.presentation.chat.ChatUiEvent
-import com.tutorconnect.presentation.chat.ChatUiState
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
@@ -59,7 +56,7 @@ class ChatViewModel @Inject constructor(
             chatRepository.getMessages(currentUserId, receiverUserId).collect { result ->
                 if (result is Resource.Success) {
                     // Pasamos la lista tal cual porque la UI espera ChatMessage de Firebase
-                    _uiState.update { it.copy(messages = result.data ?: emptyList(), isLoading = false) }
+                    _uiState.update { it.copy(messages = result.data, isLoading = false) }
                     _events.send(ChatUiEvent.ScrollToBottom)
                 }
             }

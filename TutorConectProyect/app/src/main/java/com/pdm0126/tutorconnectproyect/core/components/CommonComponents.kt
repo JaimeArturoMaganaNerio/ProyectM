@@ -1,4 +1,4 @@
-package com.tutorconnect.core.components
+package com.pdm0126.tutorconnectproyect.core.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -31,10 +31,10 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.tutorconnect.data.model.TutorStatus
-import com.tutorconnect.core.theme.StatusAvailable
-import com.tutorconnect.core.theme.StatusBusy
-import com.tutorconnect.core.theme.StatusOnline
+import com.pdm0126.tutorconnectproyect.data.model.TutorStatus
+import com.pdm0126.tutorconnectproyect.core.theme.StatusAvailable
+import com.pdm0126.tutorconnectproyect.core.theme.StatusBusy
+import com.pdm0126.tutorconnectproyect.core.theme.StatusOnline
 
 @Composable
 fun PrimaryButton(

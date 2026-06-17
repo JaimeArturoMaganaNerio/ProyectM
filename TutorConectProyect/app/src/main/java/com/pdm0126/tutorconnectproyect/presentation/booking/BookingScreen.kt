@@ -1,4 +1,4 @@
-package com.tutorconnect.presentation.booking
+package com.pdm0126.tutorconnectproyect.presentation.booking
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -31,8 +31,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.tutorconnect.core.components.AppTextField
-import com.tutorconnect.core.components.PrimaryButton
+import com.pdm0126.tutorconnectproyect.core.components.AppTextField
+import com.pdm0126.tutorconnectproyect.core.components.PrimaryButton
 import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)

@@ -2,7 +2,7 @@ package com.pdm0126.tutorconnectproyect.data.repository
 
 import com.google.firebase.firestore.FirebaseFirestore
 import com.pdm0126.tutorconnectproyect.data.model.User
-import com.tutorconnect.domain.Resource
+import com.pdm0126.tutorconnectproyect.domain.Resource
 
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject

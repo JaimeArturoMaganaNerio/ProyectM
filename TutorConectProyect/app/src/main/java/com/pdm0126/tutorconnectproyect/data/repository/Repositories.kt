@@ -4,7 +4,7 @@ import com.pdm0126.tutorconnectproyect.data.model.Booking
 import com.pdm0126.tutorconnectproyect.data.model.ChatMessage
 import com.pdm0126.tutorconnectproyect.data.model.Post
 import com.pdm0126.tutorconnectproyect.data.model.User
-import com.tutorconnect.domain.Resource
+import com.pdm0126.tutorconnectproyect.domain.Resource
 import kotlinx.coroutines.flow.Flow
 
 interface AuthRepository {

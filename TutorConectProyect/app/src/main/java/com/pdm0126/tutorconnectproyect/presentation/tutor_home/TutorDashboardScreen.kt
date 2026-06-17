@@ -1,4 +1,4 @@
-package com.tutorconnect.presentation.tutor_home
+package com.pdm0126.tutorconnectproyect.presentation.tutor_home
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
@@ -49,10 +49,10 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.tutorconnect.core.components.PrimaryButton
-import com.tutorconnect.core.theme.UcaAccent
-import com.tutorconnect.core.theme.UcaNavy
-import com.tutorconnect.core.theme.UcaNavyDark
+import com.pdm0126.tutorconnectproyect.core.components.PrimaryButton
+import com.pdm0126.tutorconnectproyect.core.theme.UcaAccent
+import com.pdm0126.tutorconnectproyect.core.theme.UcaNavy
+import com.pdm0126.tutorconnectproyect.core.theme.UcaNavyDark
 import kotlinx.coroutines.launch
 
 /**

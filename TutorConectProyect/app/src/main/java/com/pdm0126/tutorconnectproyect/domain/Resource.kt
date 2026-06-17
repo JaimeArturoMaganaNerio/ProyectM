@@ -1,4 +1,4 @@
-package com.tutorconnect.domain
+package com.pdm0126.tutorconnectproyect.domain
 
 /**
  * Generic wrapper for asynchronous results, used by repositories/ViewModels
