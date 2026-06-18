@@ -50,6 +50,8 @@ fun appEntryProvider(navigator: AppNavigator): (NavKey) -> NavEntry<NavKey> =
                 onOpenCalendar = { navigator.switchTab(AppDestinations.Calendar(isTutor = true)) },
                 onOpenCreatePost = { navigator.switchTab(AppDestinations.CreatePost) },
                 onSwitchToStudentView = { navigator.resetTo(AppDestinations.Dashboard) },
+                onNavigate = { navigator.switchTab(it) },
+                onOpenMessages = { navigator.navigateTo(AppDestinations.Messages) },
                 viewModel = hiltViewModel(),
             )
         }
@@ -112,7 +114,8 @@ fun appEntryProvider(navigator: AppNavigator): (NavKey) -> NavEntry<NavKey> =
 
         entry<AppDestinations.CreatePost> {
             CreatePostScreen(
-                onPublished = { navigator.switchTab(AppDestinations.Dashboard) },
+                onPublished = { navigator.switchTab(AppDestinations.TutorDashboard) },
+                onNavigate = { navigator.switchTab(it) },
                 viewModel = hiltViewModel(),
             )
         }

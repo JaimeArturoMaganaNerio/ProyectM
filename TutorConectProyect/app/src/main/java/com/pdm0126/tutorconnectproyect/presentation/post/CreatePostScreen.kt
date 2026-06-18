@@ -33,14 +33,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.pdm0126.tutorconnectproyect.core.components.AppBottomBar
 import com.pdm0126.tutorconnectproyect.core.components.AppTextField
 import com.pdm0126.tutorconnectproyect.core.components.PrimaryButton
+import com.pdm0126.tutorconnectproyect.core.navigation.AppDestinations
 import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreatePostScreen(
     onPublished: () -> Unit,
+    onNavigate: (AppDestinations) -> Unit,
     viewModel: CreatePostViewModel = viewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -58,6 +61,13 @@ fun CreatePostScreen(
     Scaffold(
         snackbarHost = { SnackbarHost(snackbar) },
         topBar = { TopAppBar(title = { Text("Crear Publicación") }) },
+        bottomBar = {
+            AppBottomBar(
+                isTutor = true,
+                current = AppDestinations.CreatePost,
+                onNavigate = onNavigate
+            )
+        }
     ) { padding ->
         Column(
             Modifier

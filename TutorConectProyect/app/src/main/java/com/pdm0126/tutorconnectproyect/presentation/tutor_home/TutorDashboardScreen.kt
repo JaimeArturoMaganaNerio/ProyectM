@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.*
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
@@ -52,7 +53,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.pdm0126.tutorconnectproyect.core.components.AppBottomBar
 import com.pdm0126.tutorconnectproyect.core.components.PrimaryButton
+import com.pdm0126.tutorconnectproyect.core.navigation.AppDestinations
 import com.pdm0126.tutorconnectproyect.core.theme.UcaAccent
 import com.pdm0126.tutorconnectproyect.core.theme.UcaNavy
 import com.pdm0126.tutorconnectproyect.core.theme.UcaNavyDark
@@ -70,6 +73,8 @@ fun TutorDashboardScreen(
     onOpenCalendar: () -> Unit,
     onOpenCreatePost: () -> Unit,
     onSwitchToStudentView: () -> Unit,
+    onNavigate: (AppDestinations) -> Unit,
+    onOpenMessages: () -> Unit,
     viewModel: TutorDashboardViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -106,10 +111,8 @@ fun TutorDashboardScreen(
                     IconButton(onClick = { viewModel.onSwitchToStudent() }) {
                         Icon(Icons.Filled.SwapHoriz, "Cambiar a Estudiante", tint = Color.White)
                     }
-                    IconButton(onClick = {
-                        scope.launch { snackbar.showSnackbar("Sin notificaciones nuevas") }
-                    }) {
-                        Icon(Icons.Filled.Notifications, "Notificaciones", tint = Color.White)
+                    IconButton(onClick = onOpenMessages) {
+                        Icon(Icons.AutoMirrored.Filled.Chat, "Mensajes", tint = Color.White)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -118,16 +121,13 @@ fun TutorDashboardScreen(
                 ),
             )
         },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = onOpenCreatePost,
-                containerColor = UcaAccent,
-                contentColor = Color.White,
-                shape = CircleShape,
-            ) {
-                Icon(Icons.Filled.Add, contentDescription = "Nueva publicación")
-            }
-        },
+        bottomBar = {
+            AppBottomBar(
+                isTutor = true,
+                current = AppDestinations.TutorDashboard,
+                onNavigate = onNavigate
+            )
+        }
     ) { padding ->
         LazyColumn(
             modifier = Modifier
