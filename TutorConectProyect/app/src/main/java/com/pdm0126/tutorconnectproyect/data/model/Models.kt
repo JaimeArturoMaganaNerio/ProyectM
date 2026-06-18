@@ -67,8 +67,18 @@ data class Post(
     val title: String = "",
     val content: String = "",
     val fileUrl: String = "",
+    val fileType: String = "",   // "image" o "pdf"
     val timestamp: Date = Date(),
     val tags: List<String> = emptyList()
+)
+
+data class Comment(
+    @com.google.firebase.firestore.DocumentId val id: String = "",
+    val postId: String = "",
+    val authorId: String = "",
+    val authorName: String = "",
+    val text: String = "",
+    val timestamp: java.util.Date = java.util.Date()
 )
 
 data class Booking(

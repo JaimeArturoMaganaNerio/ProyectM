@@ -4,6 +4,7 @@ data class CreatePostUiState(
     val title: String = "",
     val description: String = "",
     val attachmentName: String? = null,
+    val attachmentUri: android.net.Uri? = null,
     val isSubmitting: Boolean = false,
     val showErrors: Boolean = false,
 ) {
@@ -15,7 +16,7 @@ data class CreatePostUiState(
 sealed interface CreatePostUiAction {
     data class TitleChanged(val value: String) : CreatePostUiAction
     data class DescriptionChanged(val value: String) : CreatePostUiAction
-    data object AttachFile : CreatePostUiAction
+    data class AttachFile(val uri: android.net.Uri, val fileName: String) : CreatePostUiAction
     data object RemoveAttachment : CreatePostUiAction
     data object Submit : CreatePostUiAction
 }

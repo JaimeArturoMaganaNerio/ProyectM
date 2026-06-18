@@ -13,6 +13,7 @@ import com.pdm0126.tutorconnectproyect.presentation.groupchat.GroupChatsScreen
 import com.pdm0126.tutorconnectproyect.presentation.login.LoginScreen
 import com.pdm0126.tutorconnectproyect.presentation.messages.MessagesScreen
 import com.pdm0126.tutorconnectproyect.presentation.post.CreatePostScreen
+import com.pdm0126.tutorconnectproyect.presentation.postdetail.PostDetailScreen
 import com.pdm0126.tutorconnectproyect.presentation.profile.ProfileScreen
 import com.pdm0126.tutorconnectproyect.presentation.tutor_detail.TutorDetailScreen
 import com.pdm0126.tutorconnectproyect.presentation.tutor_home.TutorDashboardScreen
@@ -39,6 +40,9 @@ fun appEntryProvider(navigator: AppNavigator): (NavKey) -> NavEntry<NavKey> =
             DashboardScreen(
                 onNavigate = { navigator.switchTab(it) },
                 onOpenMessages = { navigator.navigateTo(AppDestinations.Messages) },
+                onOpenComments = { id, title, author ->
+                    navigator.navigateTo(AppDestinations.PostDetail(id, title, author))
+                },
                 onSwitchToTutorView = { navigator.resetTo(AppDestinations.TutorDashboard) },
                 viewModel = hiltViewModel(),
             )
@@ -100,6 +104,15 @@ fun appEntryProvider(navigator: AppNavigator): (NavKey) -> NavEntry<NavKey> =
 
         entry<AppDestinations.Messages> {
             MessagesScreen(onBack = navigator::pop)
+        }
+
+        entry<AppDestinations.PostDetail> { key ->
+            PostDetailScreen(
+                postId = key.postId,
+                postTitle = key.postTitle,
+                authorName = key.authorName,
+                onBack = navigator::pop,
+            )
         }
 
         entry<AppDestinations.Booking> { key ->

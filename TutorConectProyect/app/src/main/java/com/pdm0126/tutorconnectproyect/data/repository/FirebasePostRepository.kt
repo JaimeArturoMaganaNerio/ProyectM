@@ -2,6 +2,7 @@ package com.pdm0126.tutorconnectproyect.data.repository
 
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.pdm0126.tutorconnectproyect.data.model.Comment
 import com.pdm0126.tutorconnectproyect.data.model.Post
 import com.pdm0126.tutorconnectproyect.domain.Resource
 import kotlinx.coroutines.channels.awaitClose
@@ -43,5 +44,28 @@ class FirebasePostRepository @Inject constructor(
         } catch (e: Exception) {
             Resource.Error(e.message ?: "Error al crear la publicación")
         }
+    }
+
+    override suspend fun addComment(comment: Comment): Resource<Unit> = try {
+        val docRef = firestore.collection("comments").document()
+        docRef.set(comment.copy(id = docRef.id)).await()
+        Resource.Success(Unit)
+    } catch (e: Exception) {
+        Resource.Error(e.message ?: "Error al comentar")
+    }
+
+    override fun getComments(postId: String): Flow<Resource<List<Comment>>> = callbackFlow {
+        trySend(Resource.Loading)
+        val registration = firestore.collection("comments")
+            .orderBy("timestamp", Query.Direction.ASCENDING)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    trySend(Resource.Error(error.message ?: "Error cargando comentarios"))
+                    return@addSnapshotListener
+                }
+                val list = snapshot?.toObjects(Comment::class.java)?.filter { it.postId == postId } ?: emptyList()
+                trySend(Resource.Success(list))
+            }
+        awaitClose { registration.remove() }
     }
 }

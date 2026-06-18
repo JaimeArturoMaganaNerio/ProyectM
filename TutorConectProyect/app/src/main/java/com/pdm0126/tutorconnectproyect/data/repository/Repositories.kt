@@ -22,6 +22,8 @@ interface TutorRepository {
 interface PostRepository {
     fun getAllPosts(): kotlinx.coroutines.flow.Flow<Resource<List<Post>>>
     suspend fun createPost(post: Post): Resource<Unit>
+    suspend fun addComment(comment: com.pdm0126.tutorconnectproyect.data.model.Comment): Resource<Unit>
+    fun getComments(postId: String): kotlinx.coroutines.flow.Flow<Resource<List<com.pdm0126.tutorconnectproyect.data.model.Comment>>>
 }
 
 interface BookingRepository {

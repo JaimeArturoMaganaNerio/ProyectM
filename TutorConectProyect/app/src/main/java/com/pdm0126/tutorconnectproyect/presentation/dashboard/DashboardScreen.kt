@@ -5,6 +5,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -71,6 +72,7 @@ import kotlinx.coroutines.flow.collectLatest
 fun DashboardScreen(
     onNavigate: (AppDestinations) -> Unit,
     onOpenMessages: () -> Unit,
+    onOpenComments: (postId: String, title: String, author: String) -> Unit,
     onSwitchToTutorView: () -> Unit,
     viewModel: DashboardViewModel = viewModel(),
 ) {
@@ -277,7 +279,10 @@ fun DashboardScreen(
                     }
                 } else {
                     items(filteredPosts.distinctBy { it.id }, key = { it.id }) { post ->
-                        PostCard(post) { viewModel.onAction(DashboardUiAction.ReplyToPost(post.id)) }
+                        PostCard(
+                            post = post,
+                            onReply = { onOpenComments(post.id, post.question, post.authorName) }
+                        )
                     }
                 }
 
@@ -341,7 +346,9 @@ private fun PostCard(post: FeaturedPost, onReply: () -> Unit) {
         shape = RoundedCornerShape(14.dp),
         elevation = CardDefaults.cardElevation(1.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onReply),
     ) {
         Row(
             Modifier.padding(14.dp),

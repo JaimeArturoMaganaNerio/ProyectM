@@ -1,5 +1,8 @@
 package com.pdm0126.tutorconnectproyect.presentation.post
 
+import android.provider.OpenableColumns
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,6 +33,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -48,6 +52,20 @@ fun CreatePostScreen(
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbar = remember { SnackbarHostState() }
+    val context = LocalContext.current
+
+    val pickFile = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) {
+            var name = "archivo"
+            context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+                val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                if (nameIndex != -1 && cursor.moveToFirst()) {
+                    name = cursor.getString(nameIndex)
+                }
+            }
+            viewModel.onAction(CreatePostUiAction.AttachFile(uri, name))
+        }
+    }
 
     LaunchedEffect(Unit) {
         viewModel.events.collectLatest { event ->
@@ -100,7 +118,7 @@ fun CreatePostScreen(
 
             if (state.attachmentName == null) {
                 OutlinedButton(
-                    onClick = { viewModel.onAction(CreatePostUiAction.AttachFile) },
+                    onClick = { pickFile.launch(arrayOf("image/*", "application/pdf")) },
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Icon(Icons.Filled.AttachFile, contentDescription = null)

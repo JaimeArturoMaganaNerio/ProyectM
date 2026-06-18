@@ -27,6 +27,9 @@ sealed interface AppDestinations : NavKey {
     data class Chat(val tutorId: String, val tutorName: String) : AppDestinations
 
     @Serializable
+    data class PostDetail(val postId: String, val postTitle: String, val authorName: String) : AppDestinations
+
+    @Serializable
     data class Booking(val tutorId: String, val tutorName: String) : AppDestinations
 
     @Serializable
