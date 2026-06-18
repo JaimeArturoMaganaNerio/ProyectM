@@ -1,25 +1,37 @@
 package com.pdm0126.tutorconnectproyect.core.navigation
 
-import androidx.navigation3.NavKey
+import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
-sealed interface AppRoute : NavKey {
+sealed interface AppDestinations : NavKey {
 
     @Serializable
-    data object Login : AppRoute
+    data object Login : AppDestinations
 
     @Serializable
-    data object Dashboard : AppRoute
+    data object Dashboard : AppDestinations
 
     @Serializable
-    data object Tutors : AppRoute
+    data object Tutors : AppDestinations
 
     @Serializable
-    data class TutorDetail(val tutorId: String) : AppRoute
+    data class TutorDetail(val tutorId: String) : AppDestinations
 
     @Serializable
-    data class Chat(val receiverId: String) : AppRoute
+    data class Chat(val tutorId: String, val tutorName: String) : AppDestinations
 
     @Serializable
-    data object CreatePost : AppRoute
+    data object CreatePost : AppDestinations
+
+    @Serializable
+    data object TutorDashboard : AppDestinations
+
+    @Serializable
+    data object Calendar : AppDestinations
+
+    @Serializable
+    data class Booking(val tutorId: String, val tutorName: String) : AppDestinations
+
+    @Serializable
+    data object Profile : AppDestinations
 }

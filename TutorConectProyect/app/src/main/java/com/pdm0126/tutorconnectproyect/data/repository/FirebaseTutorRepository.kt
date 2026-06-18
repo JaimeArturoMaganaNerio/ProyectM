@@ -1,8 +1,12 @@
 package com.pdm0126.tutorconnectproyect.data.repository
 
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.snapshots
 import com.pdm0126.tutorconnectproyect.data.model.User
-import com.tutorconnect.domain.Resource
+import com.pdm0126.tutorconnectproyect.domain.Resource
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.map
 
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
@@ -11,19 +15,19 @@ class FirebaseTutorRepository @Inject constructor(
     private val firestore: FirebaseFirestore
 ) : TutorRepository {
 
-    override suspend fun getAllTutors(): Resource<List<User>> {
-        return try {
-            // Consulta real a Firestore: Solo traemos los que tienen rol TUTOR
-            val snapshot = firestore.collection("users")
-                .whereEqualTo("role", "TUTOR")
-                .get()
-                .await()
-
-            val tutors = snapshot.toObjects(User::class.java)
-            Resource.Success(tutors)
-        } catch (e: Exception) {
-            Resource.Error(e.message ?: "Error al cargar tutores")
-        }
+    override fun getAllTutors(): Flow<Resource<List<User>>> {
+        return firestore.collection("users")
+            .whereEqualTo("role", "TUTOR")
+            .snapshots() // <-- ESCUCHA CAMBIOS EN VIVO
+            .map { snapshot ->
+                // Este bloque se ejecuta CADA VEZ que agregas/editas en la consola web
+                val tutors = snapshot.toObjects(User::class.java)
+                Resource.Success(tutors) as Resource<List<User>>
+            }
+            .catch { e ->
+                // Manejo de errores del Flow
+                emit(Resource.Error(e.message ?: "Error al cargar tutores en vivo"))
+            }
     }
 
     override suspend fun getTutorById(tutorId: String): Resource<User> {

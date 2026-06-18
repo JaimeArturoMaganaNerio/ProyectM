@@ -3,10 +3,7 @@ package com.pdm0126.tutorconnectproyect.presentation.tutor_detail
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pdm0126.tutorconnectproyect.data.repository.TutorRepository
-import com.tutorconnect.domain.Resource
-import com.tutorconnect.presentation.tutor_detail.TutorDetailUiAction
-import com.tutorconnect.presentation.tutor_detail.TutorDetailUiEvent
-import com.tutorconnect.presentation.tutor_detail.TutorDetailUiState
+import com.pdm0126.tutorconnectproyect.domain.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,10 +27,28 @@ class TutorDetailViewModel @Inject constructor(
 
     fun onAction(action: TutorDetailUiAction) {
         when (action) {
-            is TutorDetailUiAction.LoadTutor -> loadTutor(action.tutorId)
-            TutorDetailUiAction.BookSession -> viewModelScope.launch { _events.send(TutorDetailUiEvent.NavigateToBooking) }
-            TutorDetailUiAction.StartChat -> viewModelScope.launch { _events.send(TutorDetailUiEvent.NavigateToChat) }
-            TutorDetailUiAction.Back -> viewModelScope.launch { _events.send(TutorDetailUiEvent.NavigateBack) }
+            is TutorDetailUiAction.Load -> loadTutor(action.tutorId)
+            is TutorDetailUiAction.SendNudge -> viewModelScope.launch {
+                _events.send(TutorDetailUiEvent.ShowMessage("Nudge enviado"))
+            }
+
+            is TutorDetailUiAction.Book -> viewModelScope.launch {
+                val tutor = _uiState.value.tutor
+                if (tutor != null) {
+                    _events.send(TutorDetailUiEvent.Book(tutor.id, tutor.name))
+                }
+            }
+
+            is TutorDetailUiAction.OpenChat -> viewModelScope.launch {
+                val tutor = _uiState.value.tutor
+                if (tutor != null) {
+                    _events.send(TutorDetailUiEvent.OpenChat(tutor.id, tutor.name))
+                }
+            }
+
+            is TutorDetailUiAction.Back -> viewModelScope.launch {
+                _events.send(TutorDetailUiEvent.Back)
+            }
         }
     }
 
@@ -41,24 +56,38 @@ class TutorDetailViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
 
+            // Llamada real a tu repositorio de Firebase
             when (val result = tutorRepository.getTutorById(tutorId)) {
                 is Resource.Success -> {
-                    val user = result.data
-                    if (user != null) {
-                        val mappedTutor = com.pdm0126.tutorconnectproyect.data.model.Tutor(
-                            id = user.id,
-                            name = user.name,
-                            subject = user.subjects.firstOrNull() ?: "General",
-                            rating = user.rating,
-                            imageUrl = user.profileImageUrl
-                        )
-                        _uiState.update { it.copy(isLoading = false, tutor = mappedTutor) }
+                    val firebaseUser = result.data
+
+                    // Mapeamos el modelo User de Firestore al modelo Tutor que usa tu interfaz
+                    val tutorData = com.pdm0126.tutorconnectproyect.data.model.Tutor(
+                        id = firebaseUser.id,
+                        name = firebaseUser.name,
+                        bio = firebaseUser.bio,
+                        rating = firebaseUser.rating,
+                        photoUrl = firebaseUser.profileImageUrl,
+                        subjects = firebaseUser.subjects,
+                        // Campos opcionales por si no existen en tu modelo User genérico de Firestore
+                        specialty = firebaseUser.subjects.firstOrNull() ?: "Tutor Académico",
+                        faculty = "Facultad de Ingeniería y Arquitectura",
+                        status = com.pdm0126.tutorconnectproyect.data.model.TutorStatus.AVAILABLE,
+                        schedule = listOf("Lunes a Viernes - Horario a convenir")
+                    )
+
+                    _uiState.update {
+                        it.copy(isLoading = false, tutor = tutorData, error = null)
                     }
                 }
                 is Resource.Error -> {
-                    _uiState.update { it.copy(isLoading = false, error = result.message) }
+                    _uiState.update {
+                        it.copy(isLoading = false, error = result.message)
+                    }
                 }
-                is Resource.Loading -> {}
+                is Resource.Loading -> {
+                    _uiState.update { it.copy(isLoading = true) }
+                }
             }
         }
     }

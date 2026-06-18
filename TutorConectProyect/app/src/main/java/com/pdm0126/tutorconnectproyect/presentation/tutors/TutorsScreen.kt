@@ -1,15 +1,15 @@
-package com.tutorconnect.presentation.tutors
+package com.pdm0126.tutorconnectproyect.presentation.tutors
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
@@ -33,12 +33,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.tutorconnect.core.components.Avatar
-import com.tutorconnect.core.components.EmptyState
-import com.tutorconnect.core.components.ErrorState
-import com.tutorconnect.core.components.LoadingState
-import com.tutorconnect.core.components.StatusChip
-import com.tutorconnect.data.model.Tutor
+import com.pdm0126.tutorconnectproyect.core.components.Avatar
+import com.pdm0126.tutorconnectproyect.core.components.EmptyState
+import com.pdm0126.tutorconnectproyect.core.components.ErrorState
+import com.pdm0126.tutorconnectproyect.core.components.LoadingState
+import com.pdm0126.tutorconnectproyect.core.components.StatusChip
+import com.pdm0126.tutorconnectproyect.data.model.Tutor
 import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -60,17 +60,21 @@ fun TutorsScreen(
 
     Column(Modifier.fillMaxSize()) {
         SearchBar(
-            query = state.query,
-            onQueryChange = { viewModel.onAction(TutorsUiAction.QueryChanged(it)) },
-            onSearch = { searchActive = false },
-            active = searchActive,
-            onActiveChange = { searchActive = it },
-            placeholder = { Text("Buscar tutor o especialidad") },
-            leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
-            colors = SearchBarDefaults.colors(),
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp),
+            inputField = {
+                SearchBarDefaults.InputField(
+                    query = state.query,
+                    onQueryChange = { viewModel.onAction(TutorsUiAction.QueryChanged(it)) },
+                    onSearch = { searchActive = false },
+                    expanded = searchActive,
+                    onExpandedChange = { searchActive = it },
+                    placeholder = { Text("Buscar tutor o especialidad") },
+                    leadingIcon = { Icon(Icons.Filled.Search, null) }
+                )
+            },
+            expanded = searchActive,
+            onExpandedChange = { searchActive = it },
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp)
         ) {
-            // Live suggestions while the search bar is expanded
             LazyColumn {
                 items(state.filtered, key = { "suggestion_${it.id}" }) { tutor ->
                     Text(

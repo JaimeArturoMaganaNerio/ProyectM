@@ -1,5 +1,6 @@
-package com.tutorconnect.presentation.dashboard
+package com.pdm0126.tutorconnectproyect.presentation.dashboard
 
+import androidx.compose.foundation.lazy.items
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -16,8 +17,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -52,20 +51,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.tutorconnect.core.components.Avatar
-import com.tutorconnect.core.components.ErrorState
-import com.tutorconnect.core.components.LoadingState
-import com.tutorconnect.core.theme.UcaAccent
-import com.tutorconnect.core.theme.UcaNavy
-import com.tutorconnect.core.theme.UcaNavyDark
-import com.tutorconnect.data.model.FeaturedPost
-import com.tutorconnect.data.model.Subject
+import com.pdm0126.tutorconnectproyect.core.components.Avatar
+import com.pdm0126.tutorconnectproyect.core.components.ErrorState
+import com.pdm0126.tutorconnectproyect.core.components.LoadingState
+import com.pdm0126.tutorconnectproyect.core.theme.UcaAccent
+import com.pdm0126.tutorconnectproyect.core.theme.UcaNavy
+import com.pdm0126.tutorconnectproyect.core.theme.UcaNavyDark
+import com.pdm0126.tutorconnectproyect.data.model.FeaturedPost
+import com.pdm0126.tutorconnectproyect.data.model.Subject
 import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(
     onOpenTutors: () -> Unit,
+    onNavigateToCreatePost: () -> Unit,
     viewModel: DashboardViewModel = viewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()

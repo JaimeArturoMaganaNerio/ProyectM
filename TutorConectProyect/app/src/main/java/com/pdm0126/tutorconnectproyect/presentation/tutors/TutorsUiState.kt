@@ -1,6 +1,6 @@
-package com.tutorconnect.presentation.tutors
+package com.pdm0126.tutorconnectproyect.presentation.tutors
 
-import com.tutorconnect.data.model.Tutor
+import com.pdm0126.tutorconnectproyect.data.model.Tutor
 
 data class TutorsUiState(
     val query: String = "",

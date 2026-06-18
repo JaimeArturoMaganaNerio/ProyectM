@@ -3,6 +3,7 @@ package com.pdm0126.tutorconnectproyect.presentation.chat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pdm0126.tutorconnectproyect.data.model.ChatMessage
+import com.pdm0126.tutorconnectproyect.data.model.UiChatMessage
 import com.pdm0126.tutorconnectproyect.data.repository.AuthRepository
 import com.pdm0126.tutorconnectproyect.data.repository.ChatRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,10 +17,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.Date
 import javax.inject.Inject
-import com.tutorconnect.domain.Resource
-import com.tutorconnect.presentation.chat.ChatUiAction
-import com.tutorconnect.presentation.chat.ChatUiEvent
-import com.tutorconnect.presentation.chat.ChatUiState
+import com.pdm0126.tutorconnectproyect.domain.Resource
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
@@ -58,8 +56,18 @@ class ChatViewModel @Inject constructor(
         viewModelScope.launch {
             chatRepository.getMessages(currentUserId, receiverUserId).collect { result ->
                 if (result is Resource.Success) {
-                    // Pasamos la lista tal cual porque la UI espera ChatMessage de Firebase
-                    _uiState.update { it.copy(messages = result.data ?: emptyList(), isLoading = false) }
+
+                    val rawMessages = result.data
+                    val uiMessages = rawMessages.map { dbMessage ->
+                        UiChatMessage(
+                            id = dbMessage.id,
+                            text = dbMessage.message,
+                            fromMe = dbMessage.senderId == currentUserId,                           timestamp = dbMessage.timestamp.toString()
+                        )
+                    }
+
+                    // 2. Pasamos la lista ya transformada al estado
+                    _uiState.update { it.copy(messages = uiMessages, isLoading = false) }
                     _events.send(ChatUiEvent.ScrollToBottom)
                 }
             }

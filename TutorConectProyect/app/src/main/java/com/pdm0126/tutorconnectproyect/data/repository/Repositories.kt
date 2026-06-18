@@ -4,7 +4,7 @@ import com.pdm0126.tutorconnectproyect.data.model.Booking
 import com.pdm0126.tutorconnectproyect.data.model.ChatMessage
 import com.pdm0126.tutorconnectproyect.data.model.Post
 import com.pdm0126.tutorconnectproyect.data.model.User
-import com.tutorconnect.domain.Resource
+import com.pdm0126.tutorconnectproyect.domain.Resource
 import kotlinx.coroutines.flow.Flow
 
 interface AuthRepository {
@@ -15,7 +15,7 @@ interface AuthRepository {
 }
 
 interface TutorRepository {
-    suspend fun getAllTutors(): Resource<List<User>>
+    fun getAllTutors(): Flow<Resource<List<User>>>
     suspend fun getTutorById(tutorId: String): Resource<User>
 }
 
@@ -26,7 +26,7 @@ interface PostRepository {
 
 interface BookingRepository {
     suspend fun createBooking(booking: Booking): Resource<Unit>
-    // Un solo método inteligente: Si es tutor busca donde él es tutor, si es estudiante busca sus solicitudes
+    // Un solo metodo inteligente: Si es tutor busca donde él es tutor, si es estudiante busca sus solicitudes
     suspend fun getBookingsForUser(userId: String, isTutor: Boolean): Resource<List<Booking>>
     suspend fun updateBookingStatus(bookingId: String, newStatus: String): Resource<Unit>
 }

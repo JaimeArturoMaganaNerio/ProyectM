@@ -1,48 +1,76 @@
 package com.pdm0126.tutorconnectproyect.core.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.tutorconnect.presentation.dashboard.DashboardScreen
-import com.tutorconnect.presentation.login.LoginScreen
-import com.tutorconnect.presentation.post.CreatePostScreen
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.ui.NavDisplay
+import com.pdm0126.tutorconnectproyect.presentation.dashboard.DashboardViewModel
+import com.pdm0126.tutorconnectproyect.presentation.login.LoginViewModel
+import com.pdm0126.tutorconnectproyect.presentation.post.CreatePostViewModel
+import com.pdm0126.tutorconnectproyect.presentation.dashboard.DashboardScreen
+import com.pdm0126.tutorconnectproyect.presentation.login.LoginScreen
+import com.pdm0126.tutorconnectproyect.presentation.post.CreatePostScreen
+import com.pdm0126.tutorconnectproyect.presentation.tutor_detail.TutorDetailScreen
+import com.pdm0126.tutorconnectproyect.presentation.tutors.TutorsScreen
 
 @Composable
 fun AppNavigation() {
-    // Inicializamos el stack de navegación en el Login
-    val backStack = rememberNavBackStack(initialRoute = AppRoute.Login)
+    // 1. Inicializamos el stack de navegación crudo de la librería
+    val backStack = rememberNavBackStack(AppDestinations.Tutors)
+
+    // 2. Creamos TU instancia de AppNavigator usando remember para que no se recree en cada recomposición
+    val navigator = remember { AppNavigator(backStack) }
 
     NavDisplay(
-        backstack = backStack,
+        backStack = backStack,
         entryProvider = entryProvider {
 
-            route<AppRoute.Login> {
+            entry<AppDestinations.Login> {
                 LoginScreen(
-                    viewModel = hiltViewModel(),
+                    viewModel = hiltViewModel<LoginViewModel>(),
                     onLoginSuccess = {
-                        // Limpiamos el backstack al ir al dashboard para no volver al login con el botón de "atrás"
-                        backStack.clear()
-                        backStack.push(AppRoute.Dashboard)
+                        navigator.resetTo(AppDestinations.Dashboard)
                     }
                 )
             }
 
-            route<AppRoute.Dashboard> {
+            entry<AppDestinations.Dashboard> {
                 DashboardScreen(
-                    viewModel = hiltViewModel(),
-                    onNavigateToTutors = { backStack.push(AppRoute.Tutors) },
-                    onNavigateToCreatePost = { backStack.push(AppRoute.CreatePost) }
+                    viewModel = hiltViewModel<DashboardViewModel>(),
+                    onOpenTutors = { navigator.navigateTo(AppDestinations.Tutors) },
+                    onNavigateToCreatePost = { navigator.navigateTo(AppDestinations.CreatePost) }
                 )
             }
 
-            route<AppRoute.CreatePost> {
+            entry<AppDestinations.CreatePost> {
                 CreatePostScreen(
-                    viewModel = hiltViewModel(),
-                    onPostCreated = { backStack.pop() },
-                    onNavigateBack = { backStack.pop() }
+                    viewModel = hiltViewModel<CreatePostViewModel>(),
+                    // ✅ Usamos tu función pop() definida en la clase
+                    onPublished = { navigator.pop() },
                 )
             }
 
-            // Aquí se irán agregando las demás rutas (Chat, TutorDetail) a medida que ajustemos sus ViewModels
+            entry<AppDestinations.Tutors> {
+                TutorsScreen(
+                    onTutorClick = { id ->
+                        navigator.navigateTo(AppDestinations.TutorDetail(id))
+                    }
+                )
+            }
+
+            entry<AppDestinations.TutorDetail> { dest ->
+
+                TutorDetailScreen(
+                    tutorId = dest.tutorId,
+                    onBack = { navigator.pop() },
+                    onOpenChat = { id, name -> }, // Vacío por ahora
+                    onBook = { id, name -> }      // Vacío por ahora
+                )
+            }
+
+            // Futuras pantallas...
         }
     )
 }

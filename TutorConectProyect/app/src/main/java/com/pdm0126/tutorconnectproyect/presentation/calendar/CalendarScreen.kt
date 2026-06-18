@@ -1,4 +1,4 @@
-package com.tutorconnect.presentation.calendar
+package com.pdm0126.tutorconnectproyect.presentation.calendar
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -32,11 +32,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.tutorconnect.core.components.EmptyState
-import com.tutorconnect.core.components.ErrorState
-import com.tutorconnect.core.components.LoadingState
-import com.tutorconnect.data.model.TutoringSession
+import com.pdm0126.tutorconnectproyect.core.components.EmptyState
+import com.pdm0126.tutorconnectproyect.core.components.ErrorState
+import com.pdm0126.tutorconnectproyect.core.components.LoadingState
+import com.pdm0126.tutorconnectproyect.data.model.TutoringSession
 import kotlinx.coroutines.flow.collectLatest
+import kotlin.collections.distinctBy
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -90,13 +91,14 @@ private fun SessionCard(session: TutoringSession, onClick: () -> Unit) {
         ) {
             DateBadge(session.date)
             Column(Modifier.weight(1f)) {
-                Text(session.subject, style = MaterialTheme.typography.titleMedium)
+                Text(session.title, style = MaterialTheme.typography.titleMedium)
                 Text("con ${session.tutorName}", style = MaterialTheme.typography.bodyMedium)
                 Text("${session.date} · ${session.time}", style = MaterialTheme.typography.labelMedium)
             }
-            val statusText = if (session.confirmed) "Confirmada" else "Pendiente"
+            val isConfirmed = session.status.equals("Confirmada", ignoreCase = true)
+            val statusText = if (isConfirmed) "Confirmada" else "Pendiente"
             val statusColor =
-                if (session.confirmed) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.tertiary
+                if (isConfirmed) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.tertiary
             Surface(color = statusColor.copy(alpha = 0.15f), contentColor = statusColor, shape = RoundedCornerShape(50)) {
                 Text(statusText, style = MaterialTheme.typography.labelMedium, modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp))
             }

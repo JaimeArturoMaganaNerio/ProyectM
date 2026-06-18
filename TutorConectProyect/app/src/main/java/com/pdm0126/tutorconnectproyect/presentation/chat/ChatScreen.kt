@@ -1,6 +1,7 @@
-package com.tutorconnect.presentation.chat
+package com.pdm0126.tutorconnectproyect.presentation.chat
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -33,8 +33,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.tutorconnect.data.model.ChatMessage
+import com.pdm0126.tutorconnectproyect.data.model.UiChatMessage
 import kotlinx.coroutines.flow.collectLatest
+import kotlin.collections.distinctBy
+import kotlin.collections.isNotEmpty
+import kotlin.collections.lastIndex
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -100,7 +103,7 @@ fun ChatScreen(
 }
 
 @Composable
-private fun MessageBubble(message: ChatMessage) {
+private fun MessageBubble(message: UiChatMessage) {
     val alignment = if (message.fromMe) Alignment.CenterEnd else Alignment.CenterStart
     val bubbleColor =
         if (message.fromMe) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant

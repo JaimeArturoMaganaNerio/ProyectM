@@ -1,8 +1,8 @@
-package com.tutorconnect.presentation.dashboard
+package com.pdm0126.tutorconnectproyect.presentation.dashboard
 
 import com.pdm0126.tutorconnectproyect.data.model.FeaturedPost
 import com.pdm0126.tutorconnectproyect.data.model.UiChatMessage
-import javax.security.auth.Subject
+import com.pdm0126.tutorconnectproyect.data.model.Subject
 
 
 data class DashboardUiState(

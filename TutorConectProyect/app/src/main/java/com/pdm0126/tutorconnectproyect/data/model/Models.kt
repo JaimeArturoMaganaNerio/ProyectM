@@ -25,11 +25,15 @@ data class FeaturedPost(
 data class Tutor(
     val id: String = "",
     val name: String = "",
-    val subject: String = "",
+    val specialty: String = "",
+    val faculty: String = "",
+    val bio: String = "",
     val rating: Double = 0.0,
     val price: String = "Gratis",
     val status: TutorStatus = TutorStatus.ONLINE,
-    val imageUrl: String? = null
+    val photoUrl: String? = null,
+    val subjects: List<String> = emptyList(),
+    val schedule: List<String> = emptyList()
 )
 
 data class UserProfile(
@@ -99,3 +103,8 @@ data class TutoringSession(
     val status: String = ""
 )
 
+data class Subject(
+    val id: String = "",
+    val name: String = "",
+    val completed: Boolean = false // Usado para mostrar el check verde
+)

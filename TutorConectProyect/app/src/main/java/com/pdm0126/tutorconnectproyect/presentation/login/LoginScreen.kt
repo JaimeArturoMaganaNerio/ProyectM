@@ -1,4 +1,4 @@
-package com.tutorconnect.presentation.login
+package com.pdm0126.tutorconnectproyect.presentation.login
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
@@ -7,6 +7,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -56,12 +57,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.tutorconnect.core.components.AppTextField
-import com.tutorconnect.core.components.PrimaryButton
-import com.tutorconnect.core.theme.UcaAccent
-import com.tutorconnect.core.theme.UcaNavy
-import com.tutorconnect.core.theme.UcaNavyDark
-import com.tutorconnect.data.model.UserRole
+import com.pdm0126.tutorconnectproyect.core.components.AppTextField
+import com.pdm0126.tutorconnectproyect.core.components.PrimaryButton
+import com.pdm0126.tutorconnectproyect.core.theme.UcaAccent
+import com.pdm0126.tutorconnectproyect.core.theme.UcaNavy
+import com.pdm0126.tutorconnectproyect.core.theme.UcaNavyDark
+import com.pdm0126.tutorconnectproyect.data.model.UserRole
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -271,7 +272,7 @@ fun LoginScreen(
                                     enabled = !state.isLoading,
                                     modifier = Modifier.fillMaxWidth().height(52.dp),
                                     shape = RoundedCornerShape(14.dp),
-                                    border = androidx.compose.foundation.BorderStroke(1.5.dp, UcaNavy.copy(alpha = 0.4f)),
+                                    border = BorderStroke(1.5.dp, UcaNavy.copy(alpha = 0.4f)),
                                 ) {
                                     Icon(Icons.Filled.Email, contentDescription = null, tint = UcaNavy)
                                     Spacer(Modifier.size(8.dp))

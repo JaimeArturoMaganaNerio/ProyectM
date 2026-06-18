@@ -4,9 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pdm0126.tutorconnectproyect.data.model.UserRole
 import com.pdm0126.tutorconnectproyect.data.repository.AuthRepository
-import com.tutorconnect.presentation.profile.ProfileUiAction
-import com.tutorconnect.presentation.profile.ProfileUiEvent
-import com.tutorconnect.presentation.profile.ProfileUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -46,7 +43,7 @@ class ProfileViewModel @Inject constructor(
             val user = authRepository.currentUser.firstOrNull()
 
             if (user != null) {
-                // Adaptamos el 'User' de Firebase al 'UserProfile' que pide tu UI
+                // Adaptamos el 'User' de Firebase al 'UserProfile'
                 val profile = UserProfile(
                     id = user.id,
                     fullName = user.name,
@@ -54,7 +51,12 @@ class ProfileViewModel @Inject constructor(
                     career = "Ingeniería", // Dato por defecto
                     role = if (user.role == "TUTOR") UserRole.TUTOR else UserRole.TUTORADO
                 )
-                _uiState.update { it.copy(user = profile, isLoading = false) }
+                _uiState.update {
+                    it.copy(
+                        user = profile,
+                        photoUrl = user.profileImageUrl, // Extraemos la foto de 'user'
+                        isLoading = false
+                    ) }
             } else {
                 _uiState.update { it.copy(isLoading = false, error = "Usuario no encontrado") }
             }

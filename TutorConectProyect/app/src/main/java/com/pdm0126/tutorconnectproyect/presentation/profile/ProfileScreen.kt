@@ -1,4 +1,4 @@
-package com.tutorconnect.presentation.profile
+package com.pdm0126.tutorconnectproyect.presentation.profile
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -35,10 +35,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.tutorconnect.core.components.Avatar
-import com.tutorconnect.core.components.ErrorState
-import com.tutorconnect.core.components.LoadingState
-import com.tutorconnect.data.model.UserProfile
+import com.pdm0126.tutorconnectproyect.core.components.Avatar
+import com.pdm0126.tutorconnectproyect.core.components.ErrorState
+import com.pdm0126.tutorconnectproyect.core.components.LoadingState
+import com.pdm0126.tutorconnectproyect.data.model.UserProfile
 import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -71,6 +71,7 @@ fun ProfileScreen(
             else -> state.user?.let { user ->
                 ProfileContent(
                     user = user,
+                    photoUrl = state.photoUrl,
                     isLoggingOut = state.isLoggingOut,
                     onEdit = { viewModel.onAction(ProfileUiAction.EditProfile) },
                     onLogout = { viewModel.onAction(ProfileUiAction.Logout) },
@@ -84,6 +85,7 @@ fun ProfileScreen(
 @Composable
 private fun ProfileContent(
     user: UserProfile,
+    photoUrl: String?,
     isLoggingOut: Boolean,
     onEdit: () -> Unit,
     onLogout: () -> Unit,
@@ -96,7 +98,7 @@ private fun ProfileContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        Avatar(photoUrl = user.photoUrl, size = 96)
+        Avatar(photoUrl = photoUrl, size = 96)
         Text(user.fullName, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
 
         Card(

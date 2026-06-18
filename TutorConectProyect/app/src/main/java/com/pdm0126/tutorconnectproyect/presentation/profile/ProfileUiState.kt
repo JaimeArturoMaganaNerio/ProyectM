@@ -1,9 +1,10 @@
-package com.tutorconnect.presentation.profile
+package com.pdm0126.tutorconnectproyect.presentation.profile
 
-import com.tutorconnect.data.model.UserProfile
+import com.pdm0126.tutorconnectproyect.data.model.UserProfile
 
 data class ProfileUiState(
     val user: UserProfile? = null,
+    val photoUrl: String? = null,
     val isLoading: Boolean = true,
     val isLoggingOut: Boolean = false,
     val error: String? = null,

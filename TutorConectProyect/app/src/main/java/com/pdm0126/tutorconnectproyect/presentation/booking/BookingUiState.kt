@@ -1,4 +1,4 @@
-package com.tutorconnect.presentation.booking
+package com.pdm0126.tutorconnectproyect.presentation.booking
 
 data class BookingUiState(
     val tutorName: String = "",

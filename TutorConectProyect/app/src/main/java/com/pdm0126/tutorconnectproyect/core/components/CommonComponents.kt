@@ -1,4 +1,4 @@
-package com.tutorconnect.core.components
+package com.pdm0126.tutorconnectproyect.core.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,16 +25,19 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.tutorconnect.data.model.TutorStatus
-import com.tutorconnect.core.theme.StatusAvailable
-import com.tutorconnect.core.theme.StatusBusy
-import com.tutorconnect.core.theme.StatusOnline
+import coil.compose.AsyncImage
+import com.pdm0126.tutorconnectproyect.core.theme.StatusAvailable
+import com.pdm0126.tutorconnectproyect.core.theme.StatusBusy
+import com.pdm0126.tutorconnectproyect.core.theme.StatusOnline
+import com.pdm0126.tutorconnectproyect.data.model.TutorStatus
 
 @Composable
 fun PrimaryButton(
@@ -112,19 +115,31 @@ fun StatusChip(status: TutorStatus, modifier: Modifier = Modifier) {
 
 @Composable
 fun Avatar(photoUrl: String?, modifier: Modifier = Modifier, size: Int = 48) {
-    // Placeholder avatar; in production wire Coil's AsyncImage to [photoUrl].
-    Surface(
-        shape = CircleShape,
-        color = MaterialTheme.colorScheme.primaryContainer,
-        modifier = modifier.size(size.dp),
-    ) {
-        Box(contentAlignment = Alignment.Center) {
-            Icon(
-                Icons.Filled.Person,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onPrimaryContainer,
-            )
+    if (photoUrl.isNullOrEmpty()) {
+        // Tu diseño original: Se muestra si el tutor no tiene URL en Firestore
+        Surface(
+            shape = CircleShape,
+            color = MaterialTheme.colorScheme.primaryContainer,
+            modifier = modifier.size(size.dp),
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Icon(
+                    Icons.Filled.Person,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                )
+            }
         }
+    } else {
+        // La implementación de Coil: Se muestra si detecta un link válido
+        AsyncImage(
+            model = photoUrl,
+            contentDescription = "Foto de perfil del tutor",
+            contentScale = ContentScale.Crop, // Evita que la foto se estire feo
+            modifier = modifier
+                .size(size.dp)
+                .clip(CircleShape) // Le da el recorte circular
+        )
     }
 }
 
