@@ -3,6 +3,8 @@ package com.pdm0126.tutorconnectproyect.data.repository
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.pdm0126.tutorconnectproyect.data.model.ChatMessage
+import com.pdm0126.tutorconnectproyect.data.model.GroupChat
+import com.pdm0126.tutorconnectproyect.data.model.GroupMessage
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -48,6 +50,46 @@ class FirebaseChatRepository @Inject constructor(
             }
 
         // Si el ViewModel muere, cancelamos el listener para evitar fugas de memoria
+        awaitClose { listener.remove() }
+    }
+
+    override fun getGroupChatsForUser(userId: String): Flow<Resource<List<GroupChat>>> = callbackFlow {
+        trySend(Resource.Loading)
+        val listener = firestore.collection("groupChats")
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    trySend(Resource.Error(error.message ?: "Error cargando chats grupales"))
+                    return@addSnapshotListener
+                }
+                val all = snapshot?.toObjects(GroupChat::class.java) ?: emptyList()
+                val filtered = all.filter { userId in it.members }
+                trySend(Resource.Success(filtered))
+            }
+        awaitClose { listener.remove() }
+    }
+
+    override suspend fun sendGroupMessage(message: GroupMessage): Resource<Unit> = try {
+        val docRef = firestore.collection("groupChats").document(message.groupChatId)
+            .collection("messages").document()
+        docRef.set(message.copy(id = docRef.id)).await()
+        Resource.Success(Unit)
+    } catch (e: Exception) {
+        Resource.Error(e.message ?: "Error al enviar mensaje grupal")
+    }
+
+    override fun getGroupMessages(groupChatId: String): Flow<Resource<List<GroupMessage>>> = callbackFlow {
+        trySend(Resource.Loading)
+        val listener = firestore.collection("groupChats").document(groupChatId)
+            .collection("messages")
+            .orderBy("timestamp", Query.Direction.ASCENDING)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    trySend(Resource.Error(error.message ?: "Error cargando mensajes"))
+                    return@addSnapshotListener
+                }
+                val list = snapshot?.toObjects(GroupMessage::class.java) ?: emptyList()
+                trySend(Resource.Success(list))
+            }
         awaitClose { listener.remove() }
     }
 }

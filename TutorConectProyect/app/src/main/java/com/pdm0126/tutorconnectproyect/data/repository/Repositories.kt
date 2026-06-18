@@ -38,4 +38,8 @@ interface ChatRepository {
     // NOTA TÉCNICA: Usamos Flow en lugar de 'suspend' porque un chat
     // necesita emitir datos en tiempo real cada vez que llega un mensaje nuevo.
     fun getMessages(userId1: String, userId2: String): Flow<Resource<List<ChatMessage>>>
+
+    fun getGroupChatsForUser(userId: String): kotlinx.coroutines.flow.Flow<Resource<List<com.pdm0126.tutorconnectproyect.data.model.GroupChat>>>
+    suspend fun sendGroupMessage(message: com.pdm0126.tutorconnectproyect.data.model.GroupMessage): Resource<Unit>
+    fun getGroupMessages(groupChatId: String): kotlinx.coroutines.flow.Flow<Resource<List<com.pdm0126.tutorconnectproyect.data.model.GroupMessage>>>
 }

@@ -39,6 +39,9 @@ sealed interface AppDestinations : NavKey {
     data class GroupChats(val isTutor: Boolean = false) : AppDestinations
 
     @Serializable
+    data class GroupChat(val groupChatId: String, val groupChatName: String) : AppDestinations
+
+    @Serializable
     data object Messages : AppDestinations
 
     @Serializable

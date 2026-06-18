@@ -119,3 +119,22 @@ data class TutoringSession(
     val status: String = "PENDING",
     val confirmed: Boolean = false // Added confirmed
 )
+
+data class GroupChat(
+    @com.google.firebase.firestore.DocumentId val id: String = "",
+    val name: String = "",      // ej: "Cálculo Avanzado - Tutor Juan"
+    val subject: String = "",   // ej: "Cálculo Avanzado"
+    val tutorId: String = "",
+    val tutorName: String = "",
+    val members: List<String> = emptyList(),   // IDs de los miembros (incluye tutorId)
+    val createdAt: java.util.Date = java.util.Date()
+)
+
+data class GroupMessage(
+    @com.google.firebase.firestore.DocumentId val id: String = "",
+    val groupChatId: String = "",
+    val senderId: String = "",
+    val senderName: String = "",
+    val text: String = "",
+    val timestamp: java.util.Date = java.util.Date()
+)

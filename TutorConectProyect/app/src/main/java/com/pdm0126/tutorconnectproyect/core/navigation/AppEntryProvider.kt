@@ -9,7 +9,8 @@ import com.pdm0126.tutorconnectproyect.presentation.booking.BookingScreen
 import com.pdm0126.tutorconnectproyect.presentation.calendar.CalendarScreen
 import com.pdm0126.tutorconnectproyect.presentation.chat.ChatScreen
 import com.pdm0126.tutorconnectproyect.presentation.dashboard.DashboardScreen
-import com.pdm0126.tutorconnectproyect.presentation.groupchat.GroupChatsScreen
+import com.pdm0126.tutorconnectproyect.presentation.groupchat.GroupChatDetailScreen
+import com.pdm0126.tutorconnectproyect.presentation.groupchat.GroupChatsListScreen
 import com.pdm0126.tutorconnectproyect.presentation.login.LoginScreen
 import com.pdm0126.tutorconnectproyect.presentation.messages.MessagesScreen
 import com.pdm0126.tutorconnectproyect.presentation.post.CreatePostScreen
@@ -96,9 +97,19 @@ fun appEntryProvider(navigator: AppNavigator): (NavKey) -> NavEntry<NavKey> =
         }
 
         entry<AppDestinations.GroupChats> { key ->
-            GroupChatsScreen(
+            GroupChatsListScreen(
                 isTutor = key.isTutor,
-                onNavigate = { navigator.switchTab(it) }
+                onNavigate = { navigator.switchTab(it) },
+                onOpenChat = { id, name -> navigator.navigateTo(AppDestinations.GroupChat(id, name)) },
+                viewModel = hiltViewModel(),
+            )
+        }
+
+        entry<AppDestinations.GroupChat> { key ->
+            GroupChatDetailScreen(
+                groupChatId = key.groupChatId,
+                groupChatName = key.groupChatName,
+                onBack = navigator::pop,
             )
         }
 
