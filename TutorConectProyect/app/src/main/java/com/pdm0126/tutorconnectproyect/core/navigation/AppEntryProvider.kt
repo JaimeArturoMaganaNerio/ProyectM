@@ -9,7 +9,9 @@ import com.pdm0126.tutorconnectproyect.presentation.booking.BookingScreen
 import com.pdm0126.tutorconnectproyect.presentation.calendar.CalendarScreen
 import com.pdm0126.tutorconnectproyect.presentation.chat.ChatScreen
 import com.pdm0126.tutorconnectproyect.presentation.dashboard.DashboardScreen
+import com.pdm0126.tutorconnectproyect.presentation.groupchat.GroupChatsScreen
 import com.pdm0126.tutorconnectproyect.presentation.login.LoginScreen
+import com.pdm0126.tutorconnectproyect.presentation.messages.MessagesScreen
 import com.pdm0126.tutorconnectproyect.presentation.post.CreatePostScreen
 import com.pdm0126.tutorconnectproyect.presentation.profile.ProfileScreen
 import com.pdm0126.tutorconnectproyect.presentation.tutor_detail.TutorDetailScreen
@@ -35,7 +37,8 @@ fun appEntryProvider(navigator: AppNavigator): (NavKey) -> NavEntry<NavKey> =
         // Dashboard del TUTORADO
         entry<AppDestinations.Dashboard> {
             DashboardScreen(
-                onOpenTutors = { navigator.switchTab(AppDestinations.Tutors) },
+                onNavigate = { navigator.switchTab(it) },
+                onOpenMessages = { navigator.navigateTo(AppDestinations.Messages) },
                 onSwitchToTutorView = { navigator.resetTo(AppDestinations.TutorDashboard) },
                 viewModel = hiltViewModel(),
             )
@@ -44,7 +47,7 @@ fun appEntryProvider(navigator: AppNavigator): (NavKey) -> NavEntry<NavKey> =
         // Dashboard del TUTOR
         entry<AppDestinations.TutorDashboard> {
             TutorDashboardScreen(
-                onOpenCalendar = { navigator.switchTab(AppDestinations.Calendar) },
+                onOpenCalendar = { navigator.switchTab(AppDestinations.Calendar(isTutor = true)) },
                 onOpenCreatePost = { navigator.switchTab(AppDestinations.CreatePost) },
                 onSwitchToStudentView = { navigator.resetTo(AppDestinations.Dashboard) },
                 viewModel = hiltViewModel(),
@@ -53,6 +56,7 @@ fun appEntryProvider(navigator: AppNavigator): (NavKey) -> NavEntry<NavKey> =
 
         entry<AppDestinations.Tutors> {
             TutorsScreen(
+                onNavigate = { navigator.switchTab(it) },
                 onTutorClick = { id -> navigator.navigateTo(AppDestinations.TutorDetail(id)) },
                 viewModel = hiltViewModel(),
             )
@@ -77,8 +81,23 @@ fun appEntryProvider(navigator: AppNavigator): (NavKey) -> NavEntry<NavKey> =
             )
         }
 
-        entry<AppDestinations.Calendar> {
-            CalendarScreen(viewModel = hiltViewModel())
+        entry<AppDestinations.Calendar> { key ->
+            CalendarScreen(
+                isTutor = key.isTutor,
+                onNavigate = { navigator.switchTab(it) },
+                viewModel = hiltViewModel()
+            )
+        }
+
+        entry<AppDestinations.GroupChats> { key ->
+            GroupChatsScreen(
+                isTutor = key.isTutor,
+                onNavigate = { navigator.switchTab(it) }
+            )
+        }
+
+        entry<AppDestinations.Messages> {
+            MessagesScreen(onBack = navigator::pop)
         }
 
         entry<AppDestinations.Booking> { key ->

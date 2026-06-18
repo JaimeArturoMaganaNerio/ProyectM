@@ -20,8 +20,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -29,6 +30,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -52,9 +55,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.pdm0126.tutorconnectproyect.core.components.AppBottomBar
 import com.pdm0126.tutorconnectproyect.core.components.Avatar
 import com.pdm0126.tutorconnectproyect.core.components.ErrorState
 import com.pdm0126.tutorconnectproyect.core.components.LoadingState
+import com.pdm0126.tutorconnectproyect.core.navigation.AppDestinations
 import com.pdm0126.tutorconnectproyect.core.theme.UcaAccent
 import com.pdm0126.tutorconnectproyect.core.theme.UcaNavy
 import com.pdm0126.tutorconnectproyect.core.theme.UcaNavyDark
@@ -64,21 +69,30 @@ import kotlinx.coroutines.flow.collectLatest
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(
-    onOpenTutors: () -> Unit,
+    onNavigate: (AppDestinations) -> Unit,
+    onOpenMessages: () -> Unit,
     onSwitchToTutorView: () -> Unit,
     viewModel: DashboardViewModel = viewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbar = remember { SnackbarHostState() }
     var visible by remember { mutableStateOf(false) }
+    var searchActive by remember { mutableStateOf(false) }
+    var searchQuery by remember { mutableStateOf("") }
+
+    val filteredPosts = remember(state.featuredPosts, searchQuery) {
+        if (searchQuery.isEmpty()) state.featuredPosts
+        else state.featuredPosts.filter { it.authorName.contains(searchQuery, ignoreCase = true) }
+    }
 
     LaunchedEffect(Unit) {
         visible = true
         viewModel.events.collectLatest { event ->
             when (event) {
-                DashboardUiEvent.NavigateToTutors -> onOpenTutors()
+                DashboardUiEvent.NavigateToTutors -> {} // Removed notification icon usage
                 DashboardUiEvent.NavigateToTutorView -> onSwitchToTutorView()
                 is DashboardUiEvent.ShowMessage -> snackbar.showSnackbar(event.message)
+                DashboardUiEvent.NavigateToTutorView -> onSwitchToTutorView()
             }
         }
     }
@@ -88,7 +102,29 @@ fun DashboardScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text("TutorConnect UCA", fontWeight = FontWeight.Bold)
+                    if (searchActive) {
+                        OutlinedTextField(
+                            value = searchQuery,
+                            onValueChange = { searchQuery = it },
+                            placeholder = { Text("Buscar tutor...") },
+                            modifier = Modifier.fillMaxWidth().padding(end = 8.dp),
+                            singleLine = true,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedTextColor = Color.White,
+                                unfocusedTextColor = Color.White,
+                                focusedBorderColor = Color.White,
+                                unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
+                                cursorColor = Color.White,
+                            ),
+                        )
+                    } else {
+                        Text("TutorConnect UCA", fontWeight = FontWeight.Bold)
+                    }
+                },
+                navigationIcon = {
+                    IconButton(onClick = { searchActive = !searchActive }) {
+                        Icon(Icons.Filled.Search, "Buscar")
+                    }
                 },
                 actions = {
                     if (state.isTutor) {
@@ -96,17 +132,25 @@ fun DashboardScreen(
                             Icon(Icons.Filled.SwapHoriz, "Cambiar a Tutor", tint = Color.White)
                         }
                     }
-                    IconButton(onClick = onOpenTutors) {
-                        Icon(Icons.Filled.Notifications, "Notificaciones", tint = Color.White)
+                    IconButton(onClick = onOpenMessages) {
+                        Icon(Icons.AutoMirrored.Filled.Chat, "Mensajes", tint = Color.White)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = UcaNavy,
                     titleContentColor = Color.White,
                     actionIconContentColor = Color.White,
+                    navigationIconContentColor = Color.White,
                 ),
             )
         },
+        bottomBar = {
+            AppBottomBar(
+                isTutor = false,
+                current = AppDestinations.Dashboard,
+                onNavigate = onNavigate
+            )
+        }
     ) { padding ->
         when {
             state.isLoading -> LoadingState(Modifier.padding(padding))
@@ -215,7 +259,7 @@ fun DashboardScreen(
                     }
                 }
 
-                if (state.featuredPosts.isEmpty()) {
+                if (filteredPosts.isEmpty()) {
                     item {
                         Card(
                             shape = RoundedCornerShape(14.dp),
@@ -224,7 +268,7 @@ fun DashboardScreen(
                             modifier = Modifier.fillMaxWidth(),
                         ) {
                             Text(
-                                "Las preguntas aparecerán cuando el backend esté conectado.",
+                                "No se encontraron resultados para la búsqueda o el backend no está conectado.",
                                 modifier = Modifier.padding(16.dp),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = Color.Gray,
@@ -232,7 +276,7 @@ fun DashboardScreen(
                         }
                     }
                 } else {
-                    items(state.featuredPosts.distinctBy { it.id }, key = { it.id }) { post ->
+                    items(filteredPosts.distinctBy { it.id }, key = { it.id }) { post ->
                         PostCard(post) { viewModel.onAction(DashboardUiAction.ReplyToPost(post.id)) }
                     }
                 }

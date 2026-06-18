@@ -30,7 +30,13 @@ sealed interface AppDestinations : NavKey {
     data class Booking(val tutorId: String, val tutorName: String) : AppDestinations
 
     @Serializable
-    data object Calendar : AppDestinations
+    data class Calendar(val isTutor: Boolean = false) : AppDestinations
+
+    @Serializable
+    data class GroupChats(val isTutor: Boolean = false) : AppDestinations
+
+    @Serializable
+    data object Messages : AppDestinations
 
     @Serializable
     data object CreatePost : AppDestinations

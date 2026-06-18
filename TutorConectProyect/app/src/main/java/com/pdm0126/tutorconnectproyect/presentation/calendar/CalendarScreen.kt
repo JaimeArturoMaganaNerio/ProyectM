@@ -32,15 +32,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.pdm0126.tutorconnectproyect.core.components.AppBottomBar
 import com.pdm0126.tutorconnectproyect.core.components.EmptyState
 import com.pdm0126.tutorconnectproyect.core.components.ErrorState
 import com.pdm0126.tutorconnectproyect.core.components.LoadingState
+import com.pdm0126.tutorconnectproyect.core.navigation.AppDestinations
 import com.pdm0126.tutorconnectproyect.data.model.TutoringSession
 import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CalendarScreen(
+    isTutor: Boolean,
+    onNavigate: (AppDestinations) -> Unit,
     viewModel: CalendarViewModel = viewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -57,6 +61,13 @@ fun CalendarScreen(
     Scaffold(
         snackbarHost = { SnackbarHost(snackbar) },
         topBar = { TopAppBar(title = { Text("Calendario") }) },
+        bottomBar = {
+            AppBottomBar(
+                isTutor = isTutor,
+                current = AppDestinations.Calendar(isTutor),
+                onNavigate = onNavigate
+            )
+        }
     ) { padding ->
         when {
             state.isLoading -> LoadingState(Modifier.padding(padding))
