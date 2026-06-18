@@ -50,7 +50,7 @@ data class User(
     val uid: String = "",
     val name: String = "",
     val email: String = "",
-    val role: String = "STUDENT", // "STUDENT" o "TUTOR"
+    val role: String = "TUTORADO", // "TUTOR" o "TUTORADO"
     val profileImageUrl: String = "",
     val bio: String = "",
     val subjects: List<String> = emptyList(),

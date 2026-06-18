@@ -3,6 +3,7 @@ package com.pdm0126.tutorconnectproyect.data.repository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.pdm0126.tutorconnectproyect.data.model.User
+import com.pdm0126.tutorconnectproyect.data.model.UserRole
 import com.pdm0126.tutorconnectproyect.domain.Resource
 
 import kotlinx.coroutines.channels.awaitClose
@@ -56,7 +57,7 @@ class FirebaseAuthRepository @Inject constructor(
             val authResult = auth.createUserWithEmailAndPassword(email, pass).await()
             val uid = authResult.user?.uid ?: throw Exception("Error creating user")
 
-            val role = if (isTutor) "TUTOR" else "STUDENT"
+            val role = if (isTutor) UserRole.TUTOR.name else UserRole.TUTORADO.name
             val newUser = User(id = uid, uid = uid, name = name, email = email, role = role)
 
             // Guardamos el perfil en Firestore

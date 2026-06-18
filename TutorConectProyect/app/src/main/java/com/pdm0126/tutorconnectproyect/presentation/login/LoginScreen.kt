@@ -66,7 +66,7 @@ import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun LoginScreen(
-    onLoginSuccess: () -> Unit,
+    onLoginSuccess: (isTutor: Boolean) -> Unit,
     viewModel: LoginViewModel = viewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -75,7 +75,7 @@ fun LoginScreen(
     LaunchedEffect(Unit) {
         viewModel.events.collectLatest { event ->
             when (event) {
-                LoginUiEvent.NavigateToDashboard -> onLoginSuccess()
+                is LoginUiEvent.NavigateToHome -> onLoginSuccess(event.isTutor)
                 is LoginUiEvent.ShowMessage -> snackbar.showSnackbar(event.message)
             }
         }

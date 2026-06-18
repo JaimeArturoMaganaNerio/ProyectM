@@ -22,7 +22,12 @@ fun appEntryProvider(navigator: AppNavigator): (NavKey) -> NavEntry<NavKey> =
 
         entry<AppDestinations.Login> {
             LoginScreen(
-                onLoginSuccess = { navigator.resetTo(AppDestinations.Dashboard) },
+                onLoginSuccess = { isTutor ->
+                    navigator.resetTo(
+                        if (isTutor) AppDestinations.TutorDashboard
+                        else AppDestinations.Dashboard
+                    )
+                },
                 viewModel = hiltViewModel(),
             )
         }

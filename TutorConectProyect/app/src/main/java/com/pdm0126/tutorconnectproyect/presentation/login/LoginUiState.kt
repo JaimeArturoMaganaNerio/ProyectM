@@ -28,6 +28,6 @@ sealed interface LoginUiAction {
 }
 
 sealed interface LoginUiEvent {
-    data object NavigateToDashboard : LoginUiEvent
+    data class NavigateToHome(val isTutor: Boolean) : LoginUiEvent
     data class ShowMessage(val message: String) : LoginUiEvent
 }

@@ -63,7 +63,8 @@ class LoginViewModel @Inject constructor(
             when (result) {
                 is Resource.Success -> {
                     _uiState.update { it.copy(isLoading = false) }
-                    _events.send(LoginUiEvent.NavigateToDashboard)
+                    val isTutor = result.data.role == UserRole.TUTOR.name
+                    _events.send(LoginUiEvent.NavigateToHome(isTutor))
                 }
                 is Resource.Error -> _uiState.update { it.copy(isLoading = false, generalError = result.message) }
                 is Resource.Loading -> {}
