@@ -16,7 +16,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DashboardViewModel @Inject constructor(
-    private val postRepository: PostRepository
+    private val postRepository: PostRepository,
+    private val authRepository: com.pdm0126.tutorconnectproyect.data.repository.AuthRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(DashboardUiState())
@@ -27,6 +28,22 @@ class DashboardViewModel @Inject constructor(
 
     init {
         loadPosts()
+        observeUser()
+    }
+
+    private fun observeUser() {
+        viewModelScope.launch {
+            authRepository.currentUser.collect { user ->
+                user?.let { u ->
+                    _uiState.update { 
+                        it.copy(
+                            studentName = u.name,
+                            isTutor = u.isTutor || u.role == "TUTOR"
+                        )
+                    }
+                }
+            }
+        }
     }
 
     fun onAction(action: DashboardUiAction) {
@@ -34,6 +51,7 @@ class DashboardViewModel @Inject constructor(
             DashboardUiAction.Retry -> loadPosts()
             is DashboardUiAction.ReplyToPost -> {}
             DashboardUiAction.OpenTutors -> viewModelScope.launch { _events.send(DashboardUiEvent.NavigateToTutors) }
+            DashboardUiAction.SwitchToTutorView -> viewModelScope.launch { _events.send(DashboardUiEvent.NavigateToTutorView) }
         }
     }
 

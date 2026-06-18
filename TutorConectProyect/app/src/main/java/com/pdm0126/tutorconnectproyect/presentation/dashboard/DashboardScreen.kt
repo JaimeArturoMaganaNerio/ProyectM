@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -64,6 +65,7 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun DashboardScreen(
     onOpenTutors: () -> Unit,
+    onSwitchToTutorView: () -> Unit,
     viewModel: DashboardViewModel = viewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -75,6 +77,7 @@ fun DashboardScreen(
         viewModel.events.collectLatest { event ->
             when (event) {
                 DashboardUiEvent.NavigateToTutors -> onOpenTutors()
+                DashboardUiEvent.NavigateToTutorView -> onSwitchToTutorView()
                 is DashboardUiEvent.ShowMessage -> snackbar.showSnackbar(event.message)
             }
         }
@@ -88,6 +91,11 @@ fun DashboardScreen(
                     Text("TutorConnect UCA", fontWeight = FontWeight.Bold)
                 },
                 actions = {
+                    if (state.isTutor) {
+                        IconButton(onClick = { viewModel.onAction(DashboardUiAction.SwitchToTutorView) }) {
+                            Icon(Icons.Filled.SwapHoriz, "Cambiar a Tutor", tint = Color.White)
+                        }
+                    }
                     IconButton(onClick = onOpenTutors) {
                         Icon(Icons.Filled.Notifications, "Notificaciones", tint = Color.White)
                     }

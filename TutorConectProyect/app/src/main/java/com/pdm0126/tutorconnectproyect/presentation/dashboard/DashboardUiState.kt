@@ -16,16 +16,19 @@ data class DashboardUiState(
     val featuredPosts: List<FeaturedPost> = emptyList(),
     val isLoading: Boolean = true,
     val error: String? = null,
-    val messages: List<UiChatMessage> = emptyList()
+    val messages: List<UiChatMessage> = emptyList(),
+    val isTutor: Boolean = false
 )
 
 sealed interface DashboardUiAction {
     data object Retry : DashboardUiAction
     data class ReplyToPost(val postId: String) : DashboardUiAction
     data object OpenTutors : DashboardUiAction
+    data object SwitchToTutorView : DashboardUiAction
 }
 
 sealed interface DashboardUiEvent {
     data object NavigateToTutors : DashboardUiEvent
     data class ShowMessage(val message: String) : DashboardUiEvent
+    data object NavigateToTutorView : DashboardUiEvent
 }

@@ -54,7 +54,10 @@ data class User(
     val profileImageUrl: String = "",
     val bio: String = "",
     val subjects: List<String> = emptyList(),
-    val rating: Double = 0.0
+    val rating: Double = 0.0,
+    val isTutor: Boolean = false,
+    val teachingSubjects: List<String> = emptyList(),   // materias que imparte
+    val enrolledSubjects: List<String> = emptyList()     // materias que lleva como tutorado
 )
 
 data class Post(

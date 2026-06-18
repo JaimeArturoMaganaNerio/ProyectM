@@ -49,10 +49,14 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pdm0126.tutorconnectproyect.core.components.PrimaryButton
 import com.pdm0126.tutorconnectproyect.core.theme.UcaAccent
 import com.pdm0126.tutorconnectproyect.core.theme.UcaNavy
 import com.pdm0126.tutorconnectproyect.core.theme.UcaNavyDark
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 /**
@@ -65,9 +69,20 @@ import kotlinx.coroutines.launch
 fun TutorDashboardScreen(
     onOpenCalendar: () -> Unit,
     onOpenCreatePost: () -> Unit,
+    onSwitchToStudentView: () -> Unit,
+    viewModel: TutorDashboardViewModel = hiltViewModel(),
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbar = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+
+    androidx.compose.runtime.LaunchedEffect(Unit) {
+        viewModel.events.collectLatest { event ->
+            when (event) {
+                TutorDashboardUiEvent.SwitchToStudentView -> onSwitchToStudentView()
+            }
+        }
+    }
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbar) },
@@ -88,6 +103,9 @@ fun TutorDashboardScreen(
                     }
                 },
                 actions = {
+                    IconButton(onClick = { viewModel.onSwitchToStudent() }) {
+                        Icon(Icons.Filled.SwapHoriz, "Cambiar a Estudiante", tint = Color.White)
+                    }
                     IconButton(onClick = {
                         scope.launch { snackbar.showSnackbar("Sin notificaciones nuevas") }
                     }) {

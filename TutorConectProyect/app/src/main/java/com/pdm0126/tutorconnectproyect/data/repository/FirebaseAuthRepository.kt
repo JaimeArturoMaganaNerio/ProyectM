@@ -58,7 +58,14 @@ class FirebaseAuthRepository @Inject constructor(
             val uid = authResult.user?.uid ?: throw Exception("Error creating user")
 
             val role = if (isTutor) UserRole.TUTOR.name else UserRole.TUTORADO.name
-            val newUser = User(id = uid, uid = uid, name = name, email = email, role = role)
+            val newUser = User(
+                id = uid,
+                uid = uid,
+                name = name,
+                email = email,
+                role = role,
+                isTutor = isTutor
+            )
 
             // Guardamos el perfil en Firestore
             firestore.collection("users").document(uid).set(newUser).await()
