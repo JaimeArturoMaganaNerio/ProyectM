@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.pdm0126.tutorconnectproyect.data.repository.PostRepository
 import com.pdm0126.tutorconnectproyect.domain.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,7 +26,7 @@ class DashboardViewModel @Inject constructor(
     val events = _events.receiveAsFlow()
 
     init {
-        loadPosts()
+        observePosts()
         observeUser()
     }
 
@@ -48,34 +47,34 @@ class DashboardViewModel @Inject constructor(
 
     fun onAction(action: DashboardUiAction) {
         when (action) {
-            DashboardUiAction.Retry -> loadPosts()
+            DashboardUiAction.Retry -> observePosts()
             is DashboardUiAction.ReplyToPost -> {}
             DashboardUiAction.OpenTutors -> viewModelScope.launch { _events.send(DashboardUiEvent.NavigateToTutors) }
             DashboardUiAction.SwitchToTutorView -> viewModelScope.launch { _events.send(DashboardUiEvent.NavigateToTutorView) }
         }
     }
 
-    fun loadPosts() {
+    fun observePosts() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
-            when (val result = postRepository.getAllPosts()) {
-                is Resource.Success -> {
-                    val mapeado = result.data.map {
-                        com.pdm0126.tutorconnectproyect.data.model.FeaturedPost(
-                            id = it.id, authorName = it.authorName, question = it.title
+            postRepository.getAllPosts().collect { result ->
+                when (result) {
+                    is Resource.Loading -> _uiState.update { it.copy(isLoading = true, error = null) }
+                    is Resource.Success -> {
+                        val mapeado = result.data.map {
+                            com.pdm0126.tutorconnectproyect.data.model.FeaturedPost(
+                                id = it.id, authorName = it.authorName, question = it.title
+                            )
+                        }
+                        _uiState.update { it.copy(isLoading = false, featuredPosts = mapeado) }
+                    }
+
+                    is Resource.Error -> _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = result.message
                         )
                     }
-                    _uiState.update { it.copy(isLoading = false, featuredPosts = mapeado) }
                 }
-
-                is Resource.Error -> _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        error = result.message
-                    )
-                }
-
-                is Resource.Loading -> {}
             }
         }
     }

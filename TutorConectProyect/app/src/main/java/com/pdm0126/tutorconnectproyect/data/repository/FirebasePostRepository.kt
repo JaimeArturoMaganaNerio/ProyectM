@@ -4,6 +4,9 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.pdm0126.tutorconnectproyect.data.model.Post
 import com.pdm0126.tutorconnectproyect.domain.Resource
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
@@ -11,19 +14,19 @@ class FirebasePostRepository @Inject constructor(
     private val firestore: FirebaseFirestore
 ) : PostRepository {
 
-    override suspend fun getAllPosts(): Resource<List<Post>> {
-        return try {
-            // Consultamos la colección "posts" y ordenamos por fecha (del más reciente al más antiguo)
-            val snapshot = firestore.collection("posts")
-                .orderBy("timestamp", Query.Direction.DESCENDING)
-                .get()
-                .await()
-
-            val posts = snapshot.toObjects(Post::class.java)
-            Resource.Success(posts)
-        } catch (e: Exception) {
-            Resource.Error(e.message ?: "Error al cargar las publicaciones")
-        }
+    override fun getAllPosts(): Flow<Resource<List<Post>>> = callbackFlow {
+        trySend(Resource.Loading)
+        val registration = firestore.collection("posts")
+            .orderBy("timestamp", Query.Direction.DESCENDING)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    trySend(Resource.Error(error.message ?: "Error al cargar las publicaciones"))
+                    return@addSnapshotListener
+                }
+                val posts = snapshot?.toObjects(Post::class.java) ?: emptyList()
+                trySend(Resource.Success(posts))
+            }
+        awaitClose { registration.remove() }
     }
 
     override suspend fun createPost(post: Post): Resource<Unit> {

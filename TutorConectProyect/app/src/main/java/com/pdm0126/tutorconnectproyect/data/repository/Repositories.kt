@@ -20,7 +20,7 @@ interface TutorRepository {
 }
 
 interface PostRepository {
-    suspend fun getAllPosts(): Resource<List<Post>>
+    fun getAllPosts(): kotlinx.coroutines.flow.Flow<Resource<List<Post>>>
     suspend fun createPost(post: Post): Resource<Unit>
 }
 
