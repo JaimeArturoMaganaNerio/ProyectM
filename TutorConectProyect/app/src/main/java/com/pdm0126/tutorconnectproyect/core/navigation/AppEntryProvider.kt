@@ -45,6 +45,7 @@ fun appEntryProvider(navigator: AppNavigator): (NavKey) -> NavEntry<NavKey> =
                     navigator.navigateTo(AppDestinations.PostDetail(id, title, author))
                 },
                 onSwitchToTutorView = { navigator.resetTo(AppDestinations.TutorDashboard) },
+                onLogout = { navigator.resetTo(AppDestinations.Login) },
                 viewModel = hiltViewModel(),
             )
         }
@@ -57,6 +58,7 @@ fun appEntryProvider(navigator: AppNavigator): (NavKey) -> NavEntry<NavKey> =
                 onSwitchToStudentView = { navigator.resetTo(AppDestinations.Dashboard) },
                 onNavigate = { navigator.switchTab(it) },
                 onOpenMessages = { navigator.navigateTo(AppDestinations.Messages) },
+                onLogout = { navigator.resetTo(AppDestinations.Login) },
                 viewModel = hiltViewModel(),
             )
         }

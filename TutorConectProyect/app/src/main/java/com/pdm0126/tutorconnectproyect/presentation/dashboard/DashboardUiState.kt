@@ -25,10 +25,12 @@ sealed interface DashboardUiAction {
     data class ReplyToPost(val postId: String) : DashboardUiAction
     data object OpenTutors : DashboardUiAction
     data object SwitchToTutorView : DashboardUiAction
+    data object Logout : DashboardUiAction
 }
 
 sealed interface DashboardUiEvent {
     data object NavigateToTutors : DashboardUiEvent
     data class ShowMessage(val message: String) : DashboardUiEvent
     data object NavigateToTutorView : DashboardUiEvent
+    data object NavigateToLogin : DashboardUiEvent
 }

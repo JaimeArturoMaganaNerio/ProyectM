@@ -51,6 +51,12 @@ class DashboardViewModel @Inject constructor(
             is DashboardUiAction.ReplyToPost -> {}
             DashboardUiAction.OpenTutors -> viewModelScope.launch { _events.send(DashboardUiEvent.NavigateToTutors) }
             DashboardUiAction.SwitchToTutorView -> viewModelScope.launch { _events.send(DashboardUiEvent.NavigateToTutorView) }
+            DashboardUiAction.Logout -> {
+                viewModelScope.launch {
+                    authRepository.logout()
+                    _events.send(DashboardUiEvent.NavigateToLogin)
+                }
+            }
         }
     }
 

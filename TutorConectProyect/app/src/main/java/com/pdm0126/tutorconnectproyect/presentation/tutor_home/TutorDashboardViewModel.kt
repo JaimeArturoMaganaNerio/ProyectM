@@ -20,6 +20,7 @@ data class TutorDashboardUiState(
 
 sealed interface TutorDashboardUiEvent {
     data object SwitchToStudentView : TutorDashboardUiEvent
+    data object NavigateToLogin : TutorDashboardUiEvent
 }
 
 @HiltViewModel
@@ -45,6 +46,13 @@ class TutorDashboardViewModel @Inject constructor(
     fun onSwitchToStudent() {
         viewModelScope.launch {
             _events.send(TutorDashboardUiEvent.SwitchToStudentView)
+        }
+    }
+
+    fun onLogout() {
+        viewModelScope.launch {
+            authRepository.logout()
+            _events.send(TutorDashboardUiEvent.NavigateToLogin)
         }
     }
 }

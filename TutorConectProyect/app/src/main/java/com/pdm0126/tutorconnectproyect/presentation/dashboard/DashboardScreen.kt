@@ -21,6 +21,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Search
@@ -74,6 +75,7 @@ fun DashboardScreen(
     onOpenMessages: () -> Unit,
     onOpenComments: (postId: String, title: String, author: String) -> Unit,
     onSwitchToTutorView: () -> Unit,
+    onLogout: () -> Unit,
     viewModel: DashboardViewModel = viewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -94,7 +96,7 @@ fun DashboardScreen(
                 DashboardUiEvent.NavigateToTutors -> {} // Removed notification icon usage
                 DashboardUiEvent.NavigateToTutorView -> onSwitchToTutorView()
                 is DashboardUiEvent.ShowMessage -> snackbar.showSnackbar(event.message)
-                DashboardUiEvent.NavigateToTutorView -> onSwitchToTutorView()
+                DashboardUiEvent.NavigateToLogin -> onLogout()
             }
         }
     }
@@ -136,6 +138,9 @@ fun DashboardScreen(
                     }
                     IconButton(onClick = onOpenMessages) {
                         Icon(Icons.AutoMirrored.Filled.Chat, "Mensajes", tint = Color.White)
+                    }
+                    IconButton(onClick = { viewModel.onAction(DashboardUiAction.Logout) }) {
+                        Icon(Icons.AutoMirrored.Filled.Logout, "Cerrar sesión", tint = Color.White)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(

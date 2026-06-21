@@ -75,6 +75,7 @@ fun TutorDashboardScreen(
     onSwitchToStudentView: () -> Unit,
     onNavigate: (AppDestinations) -> Unit,
     onOpenMessages: () -> Unit,
+    onLogout: () -> Unit,
     viewModel: TutorDashboardViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -85,6 +86,7 @@ fun TutorDashboardScreen(
         viewModel.events.collectLatest { event ->
             when (event) {
                 TutorDashboardUiEvent.SwitchToStudentView -> onSwitchToStudentView()
+                TutorDashboardUiEvent.NavigateToLogin -> onLogout()
             }
         }
     }
@@ -113,6 +115,9 @@ fun TutorDashboardScreen(
                     }
                     IconButton(onClick = onOpenMessages) {
                         Icon(Icons.AutoMirrored.Filled.Chat, "Mensajes", tint = Color.White)
+                    }
+                    IconButton(onClick = { viewModel.onLogout() }) {
+                        Icon(Icons.AutoMirrored.Filled.Logout, "Cerrar sesión", tint = Color.White)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
