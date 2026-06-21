@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -21,6 +22,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -85,6 +87,43 @@ fun CalendarScreen(
                 }
             }
         }
+    }
+
+    if (state.selectedSession != null) {
+        val session = state.selectedSession!!
+        AlertDialog(
+            onDismissRequest = { viewModel.onAction(CalendarUiAction.DismissDialog) },
+            title = { Text(session.subject.ifEmpty { "Detalle de la sesión" }) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("Con: ${session.tutorName}")
+                    Text("Fecha: ${session.date}")
+                    Text("Hora: ${session.time}")
+                    val statusLabel = if (session.confirmed) "Confirmada"
+                    else if (session.status == "REJECTED") "Rechazada"
+                    else "Pendiente"
+                    Text("Estado: $statusLabel")
+                }
+            },
+            confirmButton = {
+                if (state.isTutor && session.status == "PENDING") {
+                    TextButton(onClick = { viewModel.onAction(CalendarUiAction.UpdateStatus(session.id, "ACCEPTED")) }) {
+                        Text("Aceptar")
+                    }
+                } else {
+                    TextButton(onClick = { viewModel.onAction(CalendarUiAction.DismissDialog) }) {
+                        Text("Cerrar")
+                    }
+                }
+            },
+            dismissButton = {
+                if (state.isTutor && session.status == "PENDING") {
+                    TextButton(onClick = { viewModel.onAction(CalendarUiAction.UpdateStatus(session.id, "REJECTED")) }) {
+                        Text("Rechazar")
+                    }
+                }
+            }
+        )
     }
 }
 

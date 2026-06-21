@@ -34,8 +34,15 @@ class CalendarViewModel @Inject constructor(
     fun onAction(action: CalendarUiAction) {
         when (action) {
             CalendarUiAction.Retry -> load()
-            is CalendarUiAction.SessionClicked -> viewModelScope.launch {
-                _events.send(CalendarUiEvent.ShowMessage("Detalle de la sesión ${action.sessionId}"))
+            is CalendarUiAction.SessionClicked -> {
+                val s = _uiState.value.sessions.firstOrNull { it.id == action.sessionId }
+                _uiState.update { it.copy(selectedSession = s) }
+            }
+            CalendarUiAction.DismissDialog -> _uiState.update { it.copy(selectedSession = null) }
+            is CalendarUiAction.UpdateStatus -> viewModelScope.launch {
+                bookingRepository.updateBookingStatus(action.bookingId, action.newStatus)
+                _uiState.update { it.copy(selectedSession = null) }
+                load()
             }
         }
     }
@@ -51,7 +58,7 @@ class CalendarViewModel @Inject constructor(
                 return@launch
             }
 
-            val isTutor = currentUser.role == "TUTOR"
+            val isTutor = currentUser.isTutor || currentUser.role == "TUTOR"
 
             // 2. Traer las reservas filtradas desde Firebase
             when (val result = bookingRepository.getBookingsForUser(currentUser.id, isTutor)) {
@@ -61,14 +68,16 @@ class CalendarViewModel @Inject constructor(
                         TutoringSession(
                             id = booking.id,
                             title = booking.subject,
+                            subject = booking.subject,
                             tutorName = booking.tutorName.ifEmpty { "Tutor Asignado" },
                             date = booking.date,
                             time = booking.time,
-                            status = booking.status
+                            status = booking.status,
+                            confirmed = (booking.status == "ACCEPTED")
                         )
                     }
 
-                    _uiState.update { it.copy(sessions = sessions, isLoading = false) }
+                    _uiState.update { it.copy(sessions = sessions, isLoading = false, isTutor = isTutor) }
                 }
                 is Resource.Error -> {
                     _uiState.update { it.copy(isLoading = false, error = result.message) }
