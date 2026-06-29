@@ -1,9 +1,5 @@
 package com.pdm0126.tutorconnectproyect.domain
 
-/**
- * Generic wrapper for asynchronous results, used by repositories/ViewModels
- * to model Loading / Success / Error states cleanly.
- */
 
 sealed interface Resource<out T> {
     data object Loading : Resource<Nothing>

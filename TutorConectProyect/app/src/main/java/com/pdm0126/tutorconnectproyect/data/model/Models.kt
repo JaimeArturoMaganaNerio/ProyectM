@@ -32,7 +32,7 @@ data class Tutor(
     val price: String = "Gratis",
     val status: TutorStatus = TutorStatus.ONLINE,
     val photoUrl: String? = null,
-    val imageUrl: String? = null // Para compatibilidad
+    val imageUrl: String? = null
 )
 
 data class UserProfile(
@@ -67,7 +67,7 @@ data class Post(
     val title: String = "",
     val content: String = "",
     val fileUrl: String = "",
-    val fileType: String = "",   // "image" o "pdf"
+    val fileType: String = "",
     val timestamp: Date = Date(),
     val tags: List<String> = emptyList()
 )
@@ -99,7 +99,7 @@ data class ChatMessage(
     val receiverId: String = "",
     val message: String = "",
     val timestamp: Date = Date(),
-    val fromMe: Boolean = false // Auxiliar para UI
+    val fromMe: Boolean = false
 )
 
 data class UiChatMessage(
@@ -112,21 +112,21 @@ data class UiChatMessage(
 data class TutoringSession(
     val id: String = "",
     val title: String = "",
-    val subject: String = "", // Added subject
+    val subject: String = "",
     val tutorName: String = "",
     val date: String = "",
     val time: String = "",
     val status: String = "PENDING",
-    val confirmed: Boolean = false // Added confirmed
+    val confirmed: Boolean = false
 )
 
 data class GroupChat(
     @com.google.firebase.firestore.DocumentId val id: String = "",
-    val name: String = "",      // ej: "Cálculo Avanzado - Tutor Juan"
-    val subject: String = "",   // ej: "Cálculo Avanzado"
+    val name: String = "",
+    val subject: String = "",
     val tutorId: String = "",
     val tutorName: String = "",
-    val members: List<String> = emptyList(),   // IDs de los miembros (incluye tutorId)
+    val members: List<String> = emptyList(),
     val createdAt: java.util.Date = java.util.Date()
 )
 

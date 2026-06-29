@@ -54,11 +54,15 @@ class ChatViewModel @Inject constructor(
     private fun listenForMessages() {
         viewModelScope.launch {
             chatRepository.getMessages(currentUserId, receiverUserId).collect { result ->
+
                 if (result is Resource.Success) {
-                    // Pasamos la lista tal cual porque la UI espera ChatMessage de Firebase
-                    _uiState.update { it.copy(messages = result.data, isLoading = false) }
-                    _events.send(ChatUiEvent.ScrollToBottom)
+                // Calculamos fromMe para cada mensaje comparando senderId con currentUserId
+                val messagesWithFromMe = result.data.map { msg ->
+                    msg.copy(fromMe = msg.senderId == currentUserId)
                 }
+                _uiState.update { it.copy(messages = messagesWithFromMe, isLoading = false) }
+                _events.send(ChatUiEvent.ScrollToBottom)
+            }
             }
         }
     }
